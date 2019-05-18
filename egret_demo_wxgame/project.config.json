@@ -1,0 +1,39 @@
+{
+	"description": "项目配置文件。",
+	"setting": {
+		"urlCheck": true,
+		"es6": true,
+		"postcss": true,
+		"minified": true,
+		"newFeature": true,
+		"nodeModules": true,
+		"autoAudits": false,
+		"checkInvalidKey": true
+	},
+	"compileType": "game",
+	"libVersion": "2.6.6",
+	"appid": "wx02fb62a2b7b24e58",
+	"projectname": "%E6%88%91%E6%96%B9%E4%BA%86",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"cloudfunctionRoot": "function/",
+	"cloudfunctionTemplateRoot": "cloudfunctionTemplate",
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": [],
+			"current": -1
+		},
+		"miniprogram": {
+			"current": -1,
+			"list": []
+		}
+	}
+}

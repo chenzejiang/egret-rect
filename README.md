@@ -1,2 +1,0 @@
-# egret-rect
-egret-rect
