@@ -82,10 +82,11 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     /**
-     * 再玩一次
+     * 微信好友排行榜
      */
     private btn2():void {
-        console.log('btn2');
+        console.log('微信好友排行榜');
+        this.onShowFriendScore();
     }
 
     /**
@@ -132,7 +133,7 @@ class Main extends egret.DisplayObjectContainer {
         GameConfig.setDB();
 
         /* 开始页面 */
-        // this.startGame();
+        this.startGame();
         /* 创建开放数据域 */
         // this.openDataContext();
 
@@ -152,14 +153,22 @@ class Main extends egret.DisplayObjectContainer {
 
 
 
-        var btnClose = new egret.Sprite();
-        btnClose.graphics.beginFill(0xffffff, 1);
-        btnClose.graphics.drawRect(0, 0, 300, 300);
-        btnClose.graphics.endFill();
-        btnClose.touchEnabled = true;
-        this.btnClose = btnClose;
-        this.addChild( btnClose );
-        btnClose.once(egret.TouchEvent.TOUCH_BEGIN, this.onButtonClick, this);
+        // var btnClose = new egret.Sprite();
+        // btnClose.graphics.beginFill(0xffffff, 1);
+        // btnClose.graphics.drawRect(0, 0, 300, 300);
+        // btnClose.graphics.endFill();
+        // btnClose.touchEnabled = true;
+        // this.btnClose = btnClose;
+        // this.addChild( btnClose );
+        // btnClose.once(egret.TouchEvent.TOUCH_BEGIN, this.onShowFriendScore, this);
+
+        //简单实现，打开这关闭使用一个按钮。
+        this.rankCloseBtn = new egret.Shape();
+        this.rankCloseBtn.graphics.beginFill(0x000000, 1);
+        this.rankCloseBtn.graphics.drawRect(0, 0, 100, 100);
+        this.rankCloseBtn.graphics.endFill();
+        this.rankCloseBtn.touchEnabled = true;
+        this.rankCloseBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onShowFriendScore, this);
 
 
         //加载资源
@@ -226,53 +235,6 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     /**
-     * 描述文件加载成功，开始播放动画
-     * Description file loading is successful, start to play the animation
-     */
-    private startAnimation(result: string[]) {
-        let parser = new egret.HtmlTextParser();
-
-        let textflowArr = result.map(text => parser.parse(text));
-        let textfield = this.textfield;
-        let count = -1;
-        let change = () => {
-            count++;
-            if (count >= textflowArr.length) {
-                count = 0;
-            }
-            let textFlow = textflowArr[count];
-
-            // 切换描述内容
-            // Switch to described content
-            textfield.textFlow = textFlow;
-            let tw = egret.Tween.get(textfield);
-            tw.to({ "alpha": 1 }, 200);
-            tw.wait(2000);
-            tw.to({ "alpha": 0 }, 200);
-            tw.call(change, this);
-        };
-        change();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
      * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
      */
@@ -293,14 +255,15 @@ class Main extends egret.DisplayObjectContainer {
      * 
      */
     private rankingListMask: egret.Shape;
+    private rankCloseBtn: egret.Shape;
 
     /**
-     * 点击按钮
+     * 显示微信好友成绩排行榜
      * Click the button
      */
-    private onButtonClick(e: egret.TouchEvent) {
+    private onShowFriendScore() {
         // let openDataContext = wx.getOpenDataContext();
-        console.log('点击btnClose按钮');
+        console.log('onShowFriendScore', this.isdisplay);
         let platform: any = window.platform;
         if (this.isdisplay) {
             this.bitmap.parent && this.bitmap.parent.removeChild(this.bitmap);
@@ -322,11 +285,15 @@ class Main extends egret.DisplayObjectContainer {
             this.rankingListMask.touchEnabled = true;
             this.addChild(this.rankingListMask);
 
-            //简单实现，打开这关闭使用一个按钮。
-            this.addChild(this.btnClose);
+            this.addChild(this.rankCloseBtn);
+
+            // this.addChild(this.btnClose);
             //主要示例代码开始
+            console.log(111);
             this.bitmap = platform.openDataContext.createDisplayObject(null, this.stage.stageWidth, this.stage.stageHeight);
+            console.log(222);
             this.addChild(this.bitmap);
+            console.log(123);
             //主域向子域发送自定义消息
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,

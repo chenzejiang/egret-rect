@@ -451,10 +451,11 @@ var Main = (function (_super) {
         this.startGame();
     };
     /**
-     * 再玩一次
+     * 微信好友排行榜
      */
     Main.prototype.btn2 = function () {
-        console.log('btn2');
+        console.log('微信好友排行榜');
+        this.onShowFriendScore();
     };
     /**
      * 再玩一次
@@ -499,7 +500,7 @@ var Main = (function (_super) {
         wx.cloud.init();
         GameConfig.setDB();
         /* 开始页面 */
-        // this.startGame();
+        this.startGame();
         /* 创建开放数据域 */
         // this.openDataContext();
         /* 获取openid */
@@ -514,14 +515,21 @@ var Main = (function (_super) {
         if (localStorage.getItem('userInfo') === null || localStorage.getItem('userInfo') === "") {
             this.onCreatLoginBtn();
         }
-        var btnClose = new egret.Sprite();
-        btnClose.graphics.beginFill(0xffffff, 1);
-        btnClose.graphics.drawRect(0, 0, 300, 300);
-        btnClose.graphics.endFill();
-        btnClose.touchEnabled = true;
-        this.btnClose = btnClose;
-        this.addChild(btnClose);
-        btnClose.once(egret.TouchEvent.TOUCH_BEGIN, this.onButtonClick, this);
+        // var btnClose = new egret.Sprite();
+        // btnClose.graphics.beginFill(0xffffff, 1);
+        // btnClose.graphics.drawRect(0, 0, 300, 300);
+        // btnClose.graphics.endFill();
+        // btnClose.touchEnabled = true;
+        // this.btnClose = btnClose;
+        // this.addChild( btnClose );
+        // btnClose.once(egret.TouchEvent.TOUCH_BEGIN, this.onShowFriendScore, this);
+        //简单实现，打开这关闭使用一个按钮。
+        this.rankCloseBtn = new egret.Shape();
+        this.rankCloseBtn.graphics.beginFill(0x000000, 1);
+        this.rankCloseBtn.graphics.drawRect(0, 0, 100, 100);
+        this.rankCloseBtn.graphics.endFill();
+        this.rankCloseBtn.touchEnabled = true;
+        this.rankCloseBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onShowFriendScore, this);
         //加载资源
         var platform = window.platform;
         platform.openDataContext.postMessage({
@@ -586,33 +594,6 @@ var Main = (function (_super) {
         });
     };
     /**
-     * 描述文件加载成功，开始播放动画
-     * Description file loading is successful, start to play the animation
-     */
-    Main.prototype.startAnimation = function (result) {
-        var _this = this;
-        var parser = new egret.HtmlTextParser();
-        var textflowArr = result.map(function (text) { return parser.parse(text); });
-        var textfield = this.textfield;
-        var count = -1;
-        var change = function () {
-            count++;
-            if (count >= textflowArr.length) {
-                count = 0;
-            }
-            var textFlow = textflowArr[count];
-            // 切换描述内容
-            // Switch to described content
-            textfield.textFlow = textFlow;
-            var tw = egret.Tween.get(textfield);
-            tw.to({ "alpha": 1 }, 200);
-            tw.wait(2000);
-            tw.to({ "alpha": 0 }, 200);
-            tw.call(change, _this);
-        };
-        change();
-    };
-    /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
      * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
      */
@@ -623,12 +604,12 @@ var Main = (function (_super) {
         return result;
     };
     /**
-     * 点击按钮
+     * 显示微信好友成绩排行榜
      * Click the button
      */
-    Main.prototype.onButtonClick = function (e) {
+    Main.prototype.onShowFriendScore = function () {
         // let openDataContext = wx.getOpenDataContext();
-        console.log('点击btnClose按钮');
+        console.log('onShowFriendScore', this.isdisplay);
         var platform = window.platform;
         if (this.isdisplay) {
             this.bitmap.parent && this.bitmap.parent.removeChild(this.bitmap);
@@ -650,11 +631,14 @@ var Main = (function (_super) {
             this.rankingListMask.alpha = 0.5;
             this.rankingListMask.touchEnabled = true;
             this.addChild(this.rankingListMask);
-            //简单实现，打开这关闭使用一个按钮。
-            this.addChild(this.btnClose);
+            this.addChild(this.rankCloseBtn);
+            // this.addChild(this.btnClose);
             //主要示例代码开始
+            console.log(111);
             this.bitmap = platform.openDataContext.createDisplayObject(null, this.stage.stageWidth, this.stage.stageHeight);
+            console.log(222);
             this.addChild(this.bitmap);
+            console.log(123);
             //主域向子域发送自定义消息
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,
