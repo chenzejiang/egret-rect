@@ -47,7 +47,7 @@ class Main extends egret.DisplayObjectContainer {
             await RES.loadGroup("preload", 0, loadingView);
             this.stage.removeChild(loadingView);
             /* 添加一行代码：加载微信小游戏排行榜资源 */
-            platform.openDataContext.postMessage({command:'loadRes'});
+            // platform.openDataContext.postMessage({command:'loadRes'});
         }
         catch (e) {
             console.error(e);

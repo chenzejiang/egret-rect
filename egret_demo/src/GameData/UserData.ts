@@ -55,7 +55,7 @@ class UserData {
      * 获取历史最高分
      */
     public static prefetchHighScore() {
-        GameConfig.db.collection('score').doc(`${localStorage.getItem('openId')}-score`).get()
+        GameConfig.getDB().collection('score').doc(`${localStorage.getItem('openId')}-score`).get()
         .then(res => {
             if (this.personalHighScore) {
                 if (res.data.max > this.personalHighScore) {
@@ -77,7 +77,7 @@ class UserData {
      */
     public static getOpenId() {
         wx.cloud.callFunction({
-            name: 'login',
+            name: "login",
             success: res => {
                 console.log('getOpenId',res);
                 window["openid"] = res.result.openid;

@@ -28,7 +28,7 @@ class GameConfig {
     // 游戏得分
     private static gameScore: string = "0";
 
-    private static db: {} = null;
+    private static db:any = null;
 
     public static getBasicUrl() { return this.basicUrl };
 
@@ -44,7 +44,9 @@ class GameConfig {
 
     public static getGameScore() { return this.gameScore };
 
-    public static setDB() { this.db = wx.cloud.database(); }
+    public static setDB() { this.db = wx.cloud.database() };
+
+    public static getDB() { return this.db };
 
     public static setStageWidthHeight(stage: { stageHeight: number, stageWidth: number }) { this.stageWidth = stage.stageWidth; this.stageHeight = stage.stageHeight }
 

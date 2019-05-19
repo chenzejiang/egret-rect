@@ -265,6 +265,9 @@ var GameConfig = (function () {
     GameConfig.getGameScore = function () { return this.gameScore; };
     ;
     GameConfig.setDB = function () { this.db = wx.cloud.database(); };
+    ;
+    GameConfig.getDB = function () { return this.db; };
+    ;
     GameConfig.setStageWidthHeight = function (stage) { this.stageWidth = stage.stageWidth; this.stageHeight = stage.stageHeight; };
     GameConfig.setGameScore = function (score) { this.gameScore = score; };
     GameConfig.getWidth = function () { return this.stageWidth; };
@@ -414,8 +417,6 @@ var Main = (function (_super) {
                     case 2:
                         _a.sent();
                         this.stage.removeChild(loadingView);
-                        /* 添加一行代码：加载微信小游戏排行榜资源 */
-                        platform.openDataContext.postMessage({ command: 'loadRes' });
                         return [3 /*break*/, 4];
                     case 3:
                         e_1 = _a.sent();
@@ -2217,7 +2218,7 @@ var UserData = (function () {
      */
     UserData.prefetchHighScore = function () {
         var _this = this;
-        GameConfig.db.collection('score').doc(localStorage.getItem('openId') + "-score").get()
+        GameConfig.getDB().collection('score').doc(localStorage.getItem('openId') + "-score").get()
             .then(function (res) {
             if (_this.personalHighScore) {
                 if (res.data.max > _this.personalHighScore) {
@@ -2239,7 +2240,7 @@ var UserData = (function () {
      */
     UserData.getOpenId = function () {
         wx.cloud.callFunction({
-            name: 'login',
+            name: "login",
             success: function (res) {
                 console.log('getOpenId', res);
                 window["openid"] = res.result.openid;

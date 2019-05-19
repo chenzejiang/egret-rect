@@ -33,9 +33,24 @@ declare interface test1 {
     int(any):any;
 }
 
-declare const wx: {
+declare interface cloudTs {
+    database(callback: ()=>void): void;
+}
 
-    // cloud(): test1;
+// declare var wx : {
+// 	interface cloud {
+// 		init(): void;
+// 	}
+// }
+
+declare const wx: {
+    
+    cloud:{
+		database(): void;
+        callFunction(any): any;
+        collection(any): any;
+        init(): void;
+	}
 
     createRewardedVideoAd(any):any;
     createBannerAd(any):any;
