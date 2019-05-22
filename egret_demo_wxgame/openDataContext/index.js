@@ -7,10 +7,6 @@
 import UserDataClass from 'UserData';
 const UserData = new UserDataClass(1,2);
 
-
-
-
-
 /**
  * 资源加载组，将所需资源地址以及引用名进行注册
  * 之后可通过assets.引用名方式进行获取
@@ -493,25 +489,25 @@ function addOpenDataContextListener() {
   wx.onMessage((data) => {
     console.log(data);
     if (data.command == 'open') {
+
+      /* 获取用户好友排行榜数据 */
+      UserData.getFriendRanking().then((res)=>{
+        console.log(res);
+      }).catch((err)=>{
+        console.log(err);
+      });
+
+      /* 获取当前用户托管数据当中对应 key 的数据 */
+      UserData.getUserCloudStorage().then((res)=>{
+        console.log("获取当前用户托管数据当中对应");
+        console.log(res);
+      }).catch((err)=>{
+        console.log(err);
+      });
+
       if (!hasCreateScene) {
         //创建并初始化
         hasCreateScene = createScene();
-
-          /* 获取用户好友排行榜数据 */
-          UserData.getFriendRanking().then((res)=>{
-              console.log(res);
-          }).catch((err)=>{
-              console.log(err);
-          });
-
-          /* 获取当前用户托管数据当中对应 key 的数据 */
-          UserData.getUserCloudStorage().then((res)=>{
-              console.log("获取当前用户托管数据当中对应");
-              console.log(res);
-          }).catch((err)=>{
-              console.log(err);
-          });
-
       }
       requestAnimationFrameID = requestAnimationFrame(loop);
     } else if (data.command == 'close' && requestAnimationFrameID) {

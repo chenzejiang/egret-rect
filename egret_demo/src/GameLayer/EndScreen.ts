@@ -175,8 +175,7 @@ class EndScreen extends egret.Sprite{
 	private init(){
         /* 获取游戏分数 */
         const getGameScore = GameConfig.getGameScore();
-        /* 设置游戏分数到开发数据域 */
-        UserData.wxSetUserCloudStorage(getGameScore);
+
         /* 更新游戏分数 */
         UserData.upDateScore(Number(getGameScore));
         this.endUi();

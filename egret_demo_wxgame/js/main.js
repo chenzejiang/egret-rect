@@ -2218,7 +2218,7 @@ var UserData = (function () {
         });
     };
     /**
-     * 获取历史最高分
+     * 通过云开发数据库 获取历史最高分
      */
     UserData.prefetchHighScore = function () {
         var _this = this;
@@ -2226,8 +2226,10 @@ var UserData = (function () {
             .then(function (res) {
             if (_this.personalHighScore) {
                 if (res.data.max > _this.personalHighScore) {
+                    console.log('更新最高分数');
                     _this.personalHighScore = res.data.max;
-                    console.log(_this.personalHighScore);
+                    /* 设置最高-游戏分数到开发数据域 */
+                    UserData.wxSetUserCloudStorage(String(_this.personalHighScore));
                 }
             }
             else {
@@ -2383,7 +2385,7 @@ var ConLayer = (function (_super) {
         this.time1 = setInterval(function () {
             _this.onCreatShape();
         }, 1 * 1000);
-        this.onCreatShape();
+        // this.onCreatShape();
     };
     ConLayer.prototype.onBossTouchBegin = function (evt) {
         this.BOSS_SHAPE = 0; // 圆
@@ -2602,8 +2604,6 @@ var EndScreen = (function (_super) {
     EndScreen.prototype.init = function () {
         /* 获取游戏分数 */
         var getGameScore = GameConfig.getGameScore();
-        /* 设置游戏分数到开发数据域 */
-        UserData.wxSetUserCloudStorage(getGameScore);
         /* 更新游戏分数 */
         UserData.upDateScore(Number(getGameScore));
         this.endUi();

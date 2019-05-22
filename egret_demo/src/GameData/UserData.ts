@@ -72,18 +72,20 @@ class UserData {
         });
     }
     /**
-     * 获取历史最高分
+     * 通过云开发数据库 获取历史最高分
      */
     public static prefetchHighScore() {
         GameConfig.getDB().collection('score').doc(`${localStorage.getItem('openId')}-score`).get()
         .then(res => {
             if (this.personalHighScore) {
                 if (res.data.max > this.personalHighScore) {
+                    console.log('更新最高分数');
                     this.personalHighScore = res.data.max;
-                    console.log(this.personalHighScore);
+                    /* 设置最高-游戏分数到开发数据域 */
+                    UserData.wxSetUserCloudStorage(String(this.personalHighScore));
                 }
             } else {
-                this.personalHighScore = res.data.max
+                this.personalHighScore = res.data.max;
             }
         })
       .catch(err => {

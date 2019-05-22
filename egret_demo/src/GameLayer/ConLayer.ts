@@ -130,7 +130,7 @@ class ConLayer extends egret.Sprite{
         this.time1 = setInterval(() => {
             this.onCreatShape();
         }, 1 * 1000);
-        this.onCreatShape();
+        // this.onCreatShape();
     }
 
     private onBossTouchBegin(evt:egret.TouchEvent):void {
