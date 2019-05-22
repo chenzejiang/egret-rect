@@ -19,6 +19,26 @@ class UserData {
         return JSON.parse(JSON.stringify(this.userInfo));
     }
 
+    /**
+     * 设置微信开放数据域数据
+     */
+    public static wxSetUserCloudStorage(score:string = '0') {
+        wx.setUserCloudStorage({
+            KVDataList: [{ key: 'score', value: score }],
+            success: res => {
+                console.log('主域更新开放作用域数据成功',res);
+                // 让子域更新当前用户的最高分，因为主域无法得到getUserCloadStorage;
+                // let openDataContext = wx.getOpenDataContext();
+                // openDataContext.postMessage({
+                //     type: 'updateMaxScore',
+                // });
+            },
+            fail: res => {
+                return res;
+            }
+        });
+    }
+
     public static setUserData(userData:{avatarUrl, nickName, gender, openId, city, country}){
         this.avatarUrl = userData.avatarUrl;
         this.openId = userData.openId;
@@ -67,7 +87,7 @@ class UserData {
             }
         })
       .catch(err => {
-        console.error('db get score catch error', err)
+        console.error('db get score catch error', err);
         this.prefetchHighScoreFailed = true
       })
     }

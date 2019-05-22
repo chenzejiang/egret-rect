@@ -4,7 +4,8 @@
  * 并在主域中渲染此 SharedCanvas
  */
 
-
+import UserDataClass from 'UserData';
+const UserData = new UserDataClass(1,2);
 
 
 
@@ -27,7 +28,7 @@ const assetsUrl = {
  * 之后可通过assets.引用名方式进行获取
  */
 let assets = {};
-console.log();
+
 /**
  * canvas 大小
  * 这里暂时写死
@@ -48,7 +49,7 @@ context.globalCompositeOperation = "source-over";
  * 包括姓名，头像图片，得分
  * 排位序号i会根据parge*perPageNum+i+1进行计算
  */
-const totalGroup = [{
+let totalGroup = [{
     key: 1,
     name: "1111111111",
     url: assets.icon,
@@ -466,6 +467,12 @@ function createScene() {
     stageWidth = sharedCanvas.width;
     stageHeight = sharedCanvas.height;
     init();
+
+    // if(getFriendRanking.data.length > 0){
+        // totalGroup = getFriendRanking.data;
+    // }
+    // console.log(getFriendRanking.data);
+
     return true;
   } else {
     console.log('创建开放数据域失败，请检查是否加载开放数据域资源');
@@ -489,6 +496,22 @@ function addOpenDataContextListener() {
       if (!hasCreateScene) {
         //创建并初始化
         hasCreateScene = createScene();
+
+          /* 获取用户好友排行榜数据 */
+          UserData.getFriendRanking().then((res)=>{
+              console.log(res);
+          }).catch((err)=>{
+              console.log(err);
+          });
+
+          /* 获取当前用户托管数据当中对应 key 的数据 */
+          UserData.getUserCloudStorage().then((res)=>{
+              console.log("获取当前用户托管数据当中对应");
+              console.log(res);
+          }).catch((err)=>{
+              console.log(err);
+          });
+
       }
       requestAnimationFrameID = requestAnimationFrame(loop);
     } else if (data.command == 'close' && requestAnimationFrameID) {

@@ -2165,6 +2165,26 @@ var UserData = (function () {
     UserData.getUserData = function () {
         return JSON.parse(JSON.stringify(this.userInfo));
     };
+    /**
+     * 设置微信开放数据域数据
+     */
+    UserData.wxSetUserCloudStorage = function (score) {
+        if (score === void 0) { score = '0'; }
+        wx.setUserCloudStorage({
+            KVDataList: [{ key: 'score', value: score }],
+            success: function (res) {
+                console.log('主域更新开放作用域数据成功', res);
+                // 让子域更新当前用户的最高分，因为主域无法得到getUserCloadStorage;
+                // let openDataContext = wx.getOpenDataContext();
+                // openDataContext.postMessage({
+                //     type: 'updateMaxScore',
+                // });
+            },
+            fail: function (res) {
+                return res;
+            }
+        });
+    };
     UserData.setUserData = function (userData) {
         this.avatarUrl = userData.avatarUrl;
         this.openId = userData.openId;
@@ -2580,7 +2600,11 @@ var EndScreen = (function (_super) {
         endBtn3.addChild(endBtn3Text);
     };
     EndScreen.prototype.init = function () {
+        /* 获取游戏分数 */
         var getGameScore = GameConfig.getGameScore();
+        /* 设置游戏分数到开发数据域 */
+        UserData.wxSetUserCloudStorage(getGameScore);
+        /* 更新游戏分数 */
         UserData.upDateScore(Number(getGameScore));
         this.endUi();
     };

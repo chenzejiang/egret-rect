@@ -22,7 +22,7 @@ class EndScreen extends egret.Sprite{
     private onGetSurpassPlayerText(num:number = 0):string {
         return `超越了${num}%的玩家`
     }
-    
+
     private hideStartScreen(evt:egret.TouchEvent):void  {
         var tw = egret.Tween.get( this.end_screen );
         tw.to( {y: -GameConfig.getHeight(), alpha: 1}, 0.5 * 1000).call(function(){
@@ -77,7 +77,7 @@ class EndScreen extends egret.Sprite{
         highScoreText.y = 180;
         this.high_score_text = highScoreText;
         end_screen.addChild(highScoreText);
-        
+
         // 分数
         const gameScore = new egret.Sprite();
         gameScore.graphics.beginFill(0xffffff);
@@ -173,12 +173,13 @@ class EndScreen extends egret.Sprite{
     }
 
 	private init(){
-
+        /* 获取游戏分数 */
         const getGameScore = GameConfig.getGameScore();
+        /* 设置游戏分数到开发数据域 */
+        UserData.wxSetUserCloudStorage(getGameScore);
+        /* 更新游戏分数 */
         UserData.upDateScore(Number(getGameScore));
-
         this.endUi();
-        
     }
 	//  排行按钮回调
     private rankCallback(evt:egret.TouchEvent):void {
