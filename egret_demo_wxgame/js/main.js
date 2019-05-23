@@ -461,7 +461,21 @@ var Main = (function (_super) {
      * 再玩一次
      */
     Main.prototype.btn3 = function () {
-        console.log('btn3');
+        console.log('btn3333');
+        wx.shareAppMessage({
+            title: "我放了吖",
+            imageUrl: "",
+            query: "",
+            success: function success(res) {
+                console.log("分享成功", res);
+                // wx.showShareMenu({
+                //     withShareTicket: true
+                // });
+            },
+            fail: function fail(res) {
+                console.log("分享失败", res);
+            }
+        });
     };
     /* 游戏结束 */
     Main.prototype.end = function () {
@@ -646,7 +660,7 @@ var Main = (function (_super) {
                 year: (new Date()).getFullYear(),
                 command: "open"
             });
-            //主要示例代码结束            
+            //主要示例代码结束
             this.isdisplay = true;
         }
     };
@@ -2533,16 +2547,16 @@ var EndScreen = (function (_super) {
         gameScoreText.y = -20;
         gameScore.addChild(gameScoreText);
         // 超越了{number}%的玩家
-        var surpassPlayerText = new egret.TextField();
-        surpassPlayerText.textColor = 0xffffff;
-        surpassPlayerText.width = GameConfig.getWidth();
-        surpassPlayerText.textAlign = "center";
-        surpassPlayerText.text = this.onGetSurpassPlayerText();
-        surpassPlayerText.size = 55;
-        surpassPlayerText.lineSpacing = 15;
-        surpassPlayerText.y = 550;
-        this.surpass_player_text = surpassPlayerText;
-        end_screen.addChild(surpassPlayerText);
+        // const surpassPlayerText:egret.TextField = new egret.TextField();
+        // surpassPlayerText.textColor = 0xffffff;
+        // surpassPlayerText.width = GameConfig.getWidth();
+        // surpassPlayerText.textAlign = "center";
+        // surpassPlayerText.text = this.onGetSurpassPlayerText();
+        // surpassPlayerText.size = 55;
+        // surpassPlayerText.lineSpacing = 15;
+        // surpassPlayerText.y = 550;
+        // this.surpass_player_text = surpassPlayerText;
+        // end_screen.addChild(surpassPlayerText);
         // 再玩一次按钮
         var endBtn1 = new egret.Sprite();
         endBtn1.graphics.beginFill(0xff0000, 0);
@@ -2594,7 +2608,7 @@ var EndScreen = (function (_super) {
         endBtn3.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onBtn3, this);
         var endBtn3Text = new egret.TextField();
         endBtn3Text.textColor = 0xffffff;
-        endBtn3Text.text = "更多游戏";
+        endBtn3Text.text = "分享给朋友";
         endBtn3Text.size = 30;
         endBtn3Text.width = 200;
         endBtn3Text.textAlign = "center";

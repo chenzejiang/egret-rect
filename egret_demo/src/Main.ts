@@ -8,7 +8,7 @@ class Main extends egret.DisplayObjectContainer {
     private min;
     private endScene;
     private btnClose;
-    
+
     private onAddToStage(event: egret.Event) {
         egret.lifecycle.addLifecycleListener((context) => {
             // custom lifecycle plugin
@@ -31,7 +31,7 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     private async runGame() {
-        await this.loadResource()
+        await this.loadResource();
         this.createGameScene();
 
         // await platform.login();
@@ -53,9 +53,9 @@ class Main extends egret.DisplayObjectContainer {
             console.error(e);
         }
     }
-    
+
     private textfield: egret.TextField;
-    
+
     /* 游戏主内容 */
     private go():void {
         console.log('main-go');
@@ -64,7 +64,7 @@ class Main extends egret.DisplayObjectContainer {
         this.addChild(min);
         min.addEventListener(GameEvent.GAME_OVER, this.end, this);
     }
-    
+
     /* 游戏主内容 */
     private startGame():void {
         this.removeChildren();
@@ -93,7 +93,30 @@ class Main extends egret.DisplayObjectContainer {
      * 再玩一次
      */
     private btn3():void {
-        console.log('btn3');
+        /* 右上角转发按钮设置 */
+        // wx.onShareAppMessage(function () {
+        //     // 用户点击了“转发”按钮
+        //     return {
+        //         title: '转发标题'
+        //     }
+        // });
+
+        console.log('btn3333');
+        wx.shareAppMessage
+        ({
+            title: `我方了 ---- 我取得了${ GameConfig.getGameScore() }分, 快来挑战我吧！`,
+            imageUrl: ``,
+            query: ``, // 传参
+            success: function success(res) {
+                console.log("分享成功", res);
+                // wx.showShareMenu({
+                //     withShareTicket: true
+                // });
+            },
+            fail: function fail(res) {
+                console.log("分享失败", res);
+            }
+        });
     }
 
     /* 游戏结束 */
@@ -252,7 +275,7 @@ class Main extends egret.DisplayObjectContainer {
     /**
      * 排行榜遮罩，为了避免点击开放数据域影响到主域，在主域中建立一个遮罩层级来屏蔽点击事件.</br>
      * 根据自己的需求来设置遮罩的 alpha 值 0~1.</br>
-     * 
+     *
      */
     private rankingListMask: egret.Shape;
     private rankCloseBtn: egret.Shape;
@@ -284,16 +307,11 @@ class Main extends egret.DisplayObjectContainer {
             this.rankingListMask.alpha = 0.5;
             this.rankingListMask.touchEnabled = true;
             this.addChild(this.rankingListMask);
-
             this.addChild(this.rankCloseBtn);
-
             // this.addChild(this.btnClose);
             //主要示例代码开始
-            console.log(111);
             this.bitmap = platform.openDataContext.createDisplayObject(null, this.stage.stageWidth, this.stage.stageHeight);
-            console.log(222);
             this.addChild(this.bitmap);
-            console.log(123);
             //主域向子域发送自定义消息
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,
@@ -301,10 +319,8 @@ class Main extends egret.DisplayObjectContainer {
                 year: (new Date()).getFullYear(),
                 command: "open"
             });
-            //主要示例代码结束            
+            //主要示例代码结束
             this.isdisplay = true;
         }
- 
     }
-
 }

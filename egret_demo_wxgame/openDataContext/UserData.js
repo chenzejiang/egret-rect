@@ -4,7 +4,7 @@ class UserData {
         this.y = y;
     }
     /**
-     * 获取好友排行榜数据
+     * 获取微信好友排行榜数据
      */
      getFriendStorage() {
         return new Promise((resolve, reject) => {
@@ -41,15 +41,7 @@ class UserData {
             })
         })
     }
-    getFriendRanking() {
-        return this.getFriendStorage();
-        // let result = null;
-        // await this.getFriendStorage()
-        //     .then(res => { result = res })
-        //     .catch(err => { console.warn(err) });
-        // this.friendRanking = result || [];
-        // return result;
-    }
+
     toString() {
         return '(' + this.x + ', ' + this.y + ')';
     }

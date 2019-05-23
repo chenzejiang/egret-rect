@@ -13,7 +13,7 @@
 	"compileType": "game",
 	"libVersion": "2.6.6",
 	"appid": "wx02fb62a2b7b24e58",
-	"projectname": "%E6%88%91%E6%96%B9%E4%BA%86",
+	"projectname": "egret_rect",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"cloudfunctionRoot": "function/",

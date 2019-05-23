@@ -97,16 +97,16 @@ class EndScreen extends egret.Sprite{
         gameScore.addChild(gameScoreText);
 
         // 超越了{number}%的玩家
-        const surpassPlayerText:egret.TextField = new egret.TextField();
-        surpassPlayerText.textColor = 0xffffff;
-        surpassPlayerText.width = GameConfig.getWidth();
-        surpassPlayerText.textAlign = "center";
-        surpassPlayerText.text = this.onGetSurpassPlayerText();
-        surpassPlayerText.size = 55;
-        surpassPlayerText.lineSpacing = 15;
-        surpassPlayerText.y = 550;
-        this.surpass_player_text = surpassPlayerText;
-        end_screen.addChild(surpassPlayerText);
+        // const surpassPlayerText:egret.TextField = new egret.TextField();
+        // surpassPlayerText.textColor = 0xffffff;
+        // surpassPlayerText.width = GameConfig.getWidth();
+        // surpassPlayerText.textAlign = "center";
+        // surpassPlayerText.text = this.onGetSurpassPlayerText();
+        // surpassPlayerText.size = 55;
+        // surpassPlayerText.lineSpacing = 15;
+        // surpassPlayerText.y = 550;
+        // this.surpass_player_text = surpassPlayerText;
+        // end_screen.addChild(surpassPlayerText);
 
         // 再玩一次按钮
         const endBtn1 = new egret.Sprite();
@@ -164,7 +164,7 @@ class EndScreen extends egret.Sprite{
 
         const endBtn3Text:egret.TextField = new egret.TextField();
         endBtn3Text.textColor = 0xffffff;
-        endBtn3Text.text = "更多游戏";
+        endBtn3Text.text = "分享给朋友";
         endBtn3Text.size = 30;
         endBtn3Text.width = 200;
         endBtn3Text.textAlign = "center";

@@ -5,6 +5,7 @@
  */
 
 import UserDataClass from 'UserData';
+
 const UserData = new UserDataClass(1,2);
 
 /**
@@ -45,102 +46,13 @@ context.globalCompositeOperation = "source-over";
  * 包括姓名，头像图片，得分
  * 排位序号i会根据parge*perPageNum+i+1进行计算
  */
-let totalGroup = [{
-    key: 1,
-    name: "1111111111",
-    url: assets.icon,
-    scroes: 10000
-  },
-  {
-    key: 2,
-    name: "2222222222",
-    url: assets.icon,
-    scroes: 9000
-  },
-  {
-    key: 3,
-    name: "3333333",
-    url: assets.icon,
-    scroes: 8000
-  },
-  {
-    key: 4,
-    name: "4444444",
-    url: assets.icon,
-    scroes: 7000
-  },
-  {
-    key: 5,
-    name: "55555555",
-    url: assets.icon,
-    scroes: 6000
-  },
-  {
-    key: 6,
-    name: "6666666",
-    url: assets.icon,
-    scroes: 5000
-  },
-  {
-    key: 7,
-    name: "7777777",
-    url: assets.icon,
-    scroes: 4000
-  },
-  {
-    key: 8,
-    name: "8888888",
-    url: assets.icon,
-    scroes: 3000
-  },
-  {
-    key: 9,
-    name: "9999999",
-    url: assets.icon,
-    scroes: 2000
-  },
-  {
-    key: 10,
-    name: "1010101010",
-    url: assets.icon,
-    scroes: 2000
-  },
-  {
-    key: 11,
-    name: "111111111111",
-    url: assets.icon,
-    scroes: 2000
-  },
-  {
-    key: 12,
-    name: "121212121212",
-    url: assets.icon,
-    scroes: 2000
-  },
-  {
-    key: 13,
-    name: "13131313",
-    url: assets.icon,
-    scroes: 2000
-  },
-  {
-    key: 14,
-    name: "1414141414",
-    url: assets.icon,
-    scroes: 2000
-  },
-  {
-    key: 15,
-    name: "1515151515",
-    url: assets.icon,
-    scroes: 2000
-  },
-  {
-    key: 16,
-    name: "1616161616",
-    url: assets.icon,
-    scroes: 2000
-  },
+let totalGroup = [
+    // {
+    //     key: 1,
+    //     name: "1111111111",
+    //     url: assets.icon,
+    //     scroes: 10000
+    // }
 ];
 
 /**
@@ -463,12 +375,6 @@ function createScene() {
     stageWidth = sharedCanvas.width;
     stageHeight = sharedCanvas.height;
     init();
-
-    // if(getFriendRanking.data.length > 0){
-        // totalGroup = getFriendRanking.data;
-    // }
-    // console.log(getFriendRanking.data);
-
     return true;
   } else {
     console.log('创建开放数据域失败，请检查是否加载开放数据域资源');
@@ -489,27 +395,37 @@ function addOpenDataContextListener() {
   wx.onMessage((data) => {
     console.log(data);
     if (data.command == 'open') {
-
+      if (!hasCreateScene) {
+        //创建并初始化
+        hasCreateScene = createScene();
+        console.log('创建并初始化');
+      }
       /* 获取用户好友排行榜数据 */
-      UserData.getFriendRanking().then((res)=>{
+      UserData.getFriendStorage().then((res)=>{
         console.log(res);
+        if(res.errMsg === 'getFriendCloudStorage:ok'){
+          const getFriendArrList = res["data"].map((item, index) => {
+            return {
+              key: index + 1,
+              name: item.nickname,
+              url: item.avatarUrl,
+              scroes: item.KVDataList[0].value
+            }
+          });
+          // 改变原始数据
+          totalGroup = getFriendArrList;
+          requestAnimationFrameID = requestAnimationFrame(loop);
+        }
       }).catch((err)=>{
         console.log(err);
       });
-
-      /* 获取当前用户托管数据当中对应 key 的数据 */
+      /* 获取当前用户自己托管数据当中对应 key 的数据 */
       UserData.getUserCloudStorage().then((res)=>{
         console.log("获取当前用户托管数据当中对应");
         console.log(res);
       }).catch((err)=>{
         console.log(err);
       });
-
-      if (!hasCreateScene) {
-        //创建并初始化
-        hasCreateScene = createScene();
-      }
-      requestAnimationFrameID = requestAnimationFrame(loop);
     } else if (data.command == 'close' && requestAnimationFrameID) {
       cancelAnimationFrame(requestAnimationFrameID);
       requestAnimationFrameID = null
