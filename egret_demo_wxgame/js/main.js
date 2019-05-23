@@ -461,9 +461,16 @@ var Main = (function (_super) {
      * 再玩一次
      */
     Main.prototype.btn3 = function () {
+        /* 右上角转发按钮设置 */
+        // wx.onShareAppMessage(function () {
+        //     // 用户点击了“转发”按钮
+        //     return {
+        //         title: '转发标题'
+        //     }
+        // });
         console.log('btn3333');
         wx.shareAppMessage({
-            title: "我放了吖",
+            title: "\u6211\u65B9\u4E86 ---- \u6211\u53D6\u5F97\u4E86" + GameConfig.getGameScore() + "\u5206, \u5FEB\u6765\u6311\u6218\u6211\u5427\uFF01",
             imageUrl: "",
             query: "",
             success: function success(res) {
@@ -648,11 +655,8 @@ var Main = (function (_super) {
             this.addChild(this.rankCloseBtn);
             // this.addChild(this.btnClose);
             //主要示例代码开始
-            console.log(111);
             this.bitmap = platform.openDataContext.createDisplayObject(null, this.stage.stageWidth, this.stage.stageHeight);
-            console.log(222);
             this.addChild(this.bitmap);
-            console.log(123);
             //主域向子域发送自定义消息
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,

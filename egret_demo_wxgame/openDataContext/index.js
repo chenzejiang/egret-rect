@@ -137,7 +137,7 @@ function drawByData(data, i) {
   // 绘制底框
   console.log( barWidth, barHeight );
   // context_drawImage(assets.box, startX, startY + i * preOffsetY, barWidth, barHeight);
-  context_drawImage(assets.line, startX, startY + i * preOffsetY, barWidth, barHeight);
+  context_drawImage(assets.line, startX, startY + i * preOffsetY + barHeight, barWidth, 1);
 
   x += 10;
   // 设置字体
@@ -149,7 +149,7 @@ function drawByData(data, i) {
   let imgObj = wx.createImage();
   imgObj.src = data.url;
   imgObj.onload = function () {
-    context_drawImage(imgObj, x, startY + i * preOffsetY + (barHeight - avatarSize) / 2, avatarSize, avatarSize);
+    context_drawImage(imgObj, x, (startY + i * preOffsetY + (barHeight - avatarSize) / 2) + 15, avatarSize - 30, avatarSize - 30);
     x += avatarSize + intervalX;
     // 绘制名称
     context.fillText(data.name + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);

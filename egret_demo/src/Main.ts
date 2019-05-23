@@ -77,7 +77,7 @@ class Main extends egret.DisplayObjectContainer {
      * 再玩一次
      */
     private btn1():void {
-        console.log('btn1')
+        console.log('btn1');
         this.startGame();
     }
 
@@ -193,25 +193,11 @@ class Main extends egret.DisplayObjectContainer {
         this.rankCloseBtn.touchEnabled = true;
         this.rankCloseBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onShowFriendScore, this);
 
-
         //加载资源
         const platform:any = window.platform;
         platform.openDataContext.postMessage({
             command:'loadRes'
         });
-
-
-        let sharedBtn = new eui.Button();
-        sharedBtn.y = 605;
-        sharedBtn.label = 'btnShared';
-        this.addChild(sharedBtn);
-        // sharedBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, () => {
-        //     window.platform.shareAppMessage().then((res) => {
-        //         console.log('分享成功回调', res);
-        //     }, (err) => {
-        //         console.log('分享失败回调', err);
-        //     });
-        // }, this);
 
         /**
          * 当前按钮会退出小游戏线程
