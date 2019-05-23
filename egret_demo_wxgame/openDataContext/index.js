@@ -5,7 +5,6 @@
  */
 
 import UserDataClass from 'UserData';
-
 const UserData = new UserDataClass(1,2);
 
 /**
@@ -17,6 +16,7 @@ const assetsUrl = {
   box: "openDataContext/assets/box.png",
   panel: "openDataContext/assets/panel.png",
   button: "openDataContext/assets/button.png",
+  line: "openDataContext/assets/line.png",
   title: "openDataContext/assets/rankingtitle.png"
 };
 
@@ -134,22 +134,29 @@ function drawRankByGroup(currentGroup) {
  */
 function drawByData(data, i) {
   let x = startX;
-  //绘制底框
-  context_drawImage(assets.box, startX, startY + i * preOffsetY, barWidth, barHeight);
+  // 绘制底框
+  console.log( barWidth, barHeight );
+  // context_drawImage(assets.box, startX, startY + i * preOffsetY, barWidth, barHeight);
+  context_drawImage(assets.line, startX, startY + i * preOffsetY, barWidth, barHeight);
+
   x += 10;
-  //设置字体
+  // 设置字体
   context.font = fontSize + "px Arial";
-  //绘制序号
+  // 绘制序号
   context.fillText(data.key + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
   x += indexWidth + intervalX;
-  //绘制头像
-  context_drawImage(assets.icon, x, startY + i * preOffsetY + (barHeight - avatarSize) / 2, avatarSize, avatarSize);
-  x += avatarSize + intervalX;
-  //绘制名称
-  context.fillText(data.name + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
-  x += textMaxSize + intervalX;
-  //绘制分数
-  context.fillText(data.scroes + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
+  // 绘制头像
+  let imgObj = wx.createImage();
+  imgObj.src = data.url;
+  imgObj.onload = function () {
+    context_drawImage(imgObj, x, startY + i * preOffsetY + (barHeight - avatarSize) / 2, avatarSize, avatarSize);
+    x += avatarSize + intervalX;
+    // 绘制名称
+    context.fillText(data.name + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
+    x += textMaxSize + intervalX;
+    // 绘制分数
+    context.fillText(data.scroes + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
+  };
 }
 
 /**
@@ -357,7 +364,6 @@ function preloadAssets() {
         // console.log("加载完成");
         hasLoadRes = true;
       }
-
     }
     img.src = assetsUrl[asset];
     assets[asset] = img;
@@ -371,7 +377,7 @@ function preloadAssets() {
  */
 function createScene() {
   if (sharedCanvas.width && sharedCanvas.height) {
-    console.log('初始化绘制屏幕完成')
+    console.log('初始化绘制屏幕完成');
     stageWidth = sharedCanvas.width;
     stageHeight = sharedCanvas.height;
     init();
@@ -412,8 +418,17 @@ function addOpenDataContextListener() {
               scroes: item.KVDataList[0].value
             }
           });
+          // let new_arr = [];
+          // for (let i = 0; i < 10; i++) {
+          //   console.log(i+1);
+          //   let obj = getFriendArrList[0];
+          //   obj["key"] = i;
+          //   console.log(obj);
+          //   new_arr.push(obj);
+          // }
           // 改变原始数据
           totalGroup = getFriendArrList;
+          console.log(totalGroup);
           requestAnimationFrameID = requestAnimationFrame(loop);
         }
       }).catch((err)=>{
