@@ -4,10 +4,11 @@ class Main extends egret.DisplayObjectContainer {
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
 
+    private bitmap: egret.Bitmap;
+    private isdisplay = false;
+    private rankingListMask: egret.Shape;
+    private rankCloseBtn: egret.Bitmap;
     private startScene;
-    private min;
-    private endScene;
-    private btnClose;
 
     private onAddToStage(event: egret.Event) {
         egret.lifecycle.addLifecycleListener((context) => {
@@ -15,15 +16,15 @@ class Main extends egret.DisplayObjectContainer {
             context.onUpdate = () => {
 
             }
-        })
+        });
 
         egret.lifecycle.onPause = () => {
             egret.ticker.pause();
-        }
+        };
 
         egret.lifecycle.onResume = () => {
             egret.ticker.resume();
-        }
+        };
 
         this.runGame().catch(e => {
             console.log(e);
@@ -90,33 +91,10 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     /**
-     * 再玩一次
+     * 分享给朋友
      */
     private btn3():void {
-        /* 右上角转发按钮设置 */
-        // wx.onShareAppMessage(function () {
-        //     // 用户点击了“转发”按钮
-        //     return {
-        //         title: '转发标题'
-        //     }
-        // });
-
-        console.log('btn3333');
-        wx.shareAppMessage
-        ({
-            title: `我方了 ---- 我取得了${ GameConfig.getGameScore() }分, 快来挑战我吧！`,
-            imageUrl: ``,
-            query: ``, // 传参
-            success: function success(res) {
-                console.log("分享成功", res);
-                // wx.showShareMenu({
-                //     withShareTicket: true
-                // });
-            },
-            fail: function fail(res) {
-                console.log("分享失败", res);
-            }
-        });
+        UserData.shareAppMessage();
     }
 
     /* 游戏结束 */
@@ -172,25 +150,14 @@ class Main extends egret.DisplayObjectContainer {
             this.onCreatLoginBtn();
         }
 
-
-
-
-
-        // var btnClose = new egret.Sprite();
-        // btnClose.graphics.beginFill(0xffffff, 1);
-        // btnClose.graphics.drawRect(0, 0, 300, 300);
-        // btnClose.graphics.endFill();
-        // btnClose.touchEnabled = true;
-        // this.btnClose = btnClose;
-        // this.addChild( btnClose );
-        // btnClose.once(egret.TouchEvent.TOUCH_BEGIN, this.onShowFriendScore, this);
-
-        //简单实现，打开这关闭使用一个按钮。
-        this.rankCloseBtn = new egret.Shape();
-        this.rankCloseBtn.graphics.beginFill(0x000000, 1);
-        this.rankCloseBtn.graphics.drawRect(0, 0, 100, 100);
-        this.rankCloseBtn.graphics.endFill();
-        this.rankCloseBtn.touchEnabled = true;
+        /* 返回按钮, 关闭排行榜 */
+        this.rankCloseBtn = eKit.createBitmapByName("return_icon_png", {
+            width: 80,
+            height: 80,
+            x: 80,
+            y: 20,
+            touchEnabled: true
+        });
         this.rankCloseBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onShowFriendScore, this);
 
         //加载资源
@@ -199,34 +166,14 @@ class Main extends egret.DisplayObjectContainer {
             command:'loadRes'
         });
 
-        /**
-         * 当前按钮会退出小游戏线程
-         */
-
-        // let close = new eui.Button();
-        // close.y = 135;
-        // close.label = '退出';
-        // this.addChild(close);
-
-        // close.addEventListener(egret.TouchEvent.TOUCH_TAP, () => {
-        //     wx.exitMiniProgram({
-        //         success: (res) => {
-        //             console.log('退出成功', res);
-        //         },
-        //         fail: (err) => {
-        //             console.log('退出失败', err);
-        //         },
-        //         complete: (res) => {
-
-        //         }
-        //     })
-        // }, this);
+        /* 设置分享内容 */
+        UserData.onShareAppMessage();
+        /* 打开右上角分享 */
+        UserData.onShowShareMenu();
 
         this.addEventListener(egret.TouchEvent.TOUCH_TAP, (evt: egret.TouchEvent) => {
             console.log('输出主域点击事件');
         }, this)
-
-
     }
 
     /**
@@ -242,30 +189,6 @@ class Main extends egret.DisplayObjectContainer {
         WxKit.setDefaultShare();
         WxKit.setOnShowRule();
     }
-
-    /**
-     * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
-     * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
-     */
-    private createBitmapByName(name: string): egret.Bitmap {
-        let result = new egret.Bitmap();
-        let texture: egret.Texture = RES.getRes(name);
-        result.texture = texture;
-        return result;
-    }
-
-    private bitmap: egret.Bitmap;
-
-    private isdisplay = false;
-
-    /**
-     * 排行榜遮罩，为了避免点击开放数据域影响到主域，在主域中建立一个遮罩层级来屏蔽点击事件.</br>
-     * 根据自己的需求来设置遮罩的 alpha 值 0~1.</br>
-     *
-     */
-    private rankingListMask: egret.Shape;
-    private rankCloseBtn: egret.Shape;
-
     /**
      * 显示微信好友成绩排行榜
      * Click the button
@@ -277,6 +200,7 @@ class Main extends egret.DisplayObjectContainer {
         if (this.isdisplay) {
             this.bitmap.parent && this.bitmap.parent.removeChild(this.bitmap);
             this.rankingListMask.parent && this.rankingListMask.parent.removeChild(this.rankingListMask);
+            this.rankCloseBtn.parent && this.rankCloseBtn.parent.removeChild(this.rankCloseBtn);
             this.isdisplay = false;
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,
@@ -287,7 +211,7 @@ class Main extends egret.DisplayObjectContainer {
         } else {
             //处理遮罩，避免开放数据域事件影响主域。
             this.rankingListMask = new egret.Shape();
-            this.rankingListMask.graphics.beginFill(0x000000, 1);
+            this.rankingListMask.graphics.beginFill(0x000000, 0.2);
             this.rankingListMask.graphics.drawRect(0, 0, this.stage.width, this.stage.height);
             this.rankingListMask.graphics.endFill();
             this.rankingListMask.alpha = 0.5;

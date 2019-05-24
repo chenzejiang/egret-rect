@@ -10,6 +10,14 @@
 		"autoAudits": false,
 		"checkInvalidKey": true
 	},
+	"packOptions": {
+		"ignore": [
+			{
+				"type": "folder",
+				"value": ".idea"
+			}
+		]
+	},
 	"compileType": "game",
 	"libVersion": "2.6.6",
 	"appid": "wx02fb62a2b7b24e58",

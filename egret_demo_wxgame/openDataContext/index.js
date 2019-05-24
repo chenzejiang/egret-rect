@@ -139,9 +139,10 @@ function drawByData(data, i) {
   // context_drawImage(assets.box, startX, startY + i * preOffsetY, barWidth, barHeight);
   context_drawImage(assets.line, startX, startY + i * preOffsetY + barHeight, barWidth, 1);
 
-  x += 10;
+  x += 20;
   // 设置字体
   context.font = fontSize + "px Arial";
+  context.fillStyle = '#FFF';
   // 绘制序号
   context.fillText(data.key + "", x, startY + i * preOffsetY + textOffsetY, textMaxSize);
   x += indexWidth + intervalX;

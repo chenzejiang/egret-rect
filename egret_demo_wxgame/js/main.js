@@ -262,6 +262,8 @@ var GameConfig = (function () {
     ;
     GameConfig.getShareImg = function () { return this.shareImg; };
     ;
+    GameConfig.getShareImgId = function () { return this.shareImgId; };
+    ;
     GameConfig.getGameScore = function () { return this.gameScore; };
     ;
     GameConfig.setDB = function () { this.db = wx.cloud.database(); };
@@ -290,8 +292,10 @@ var GameConfig = (function () {
     GameConfig.version = "1.0.0";
     // 游戏基本分享标题
     GameConfig.shareTitle = "分享标题";
-    // 游戏基本分享图片
-    GameConfig.shareImg = "imgUrl";
+    // 游戏基本分享图片  , 从微信后台上传审核 比例：5:4
+    GameConfig.shareImg = "https://mmocgame.qpic.cn/wechatgame/0bucgU1yYX0prub4nPnJpE4vYD8TXH4o6vscbYibicFbRrOUBuZeMX8yVeBnX8xSicm/0";
+    // 游戏基本分享图片ID , 从微信后台上传审核
+    GameConfig.shareImgId = "oFIAckl3SMaBYfOaptmXlQ";
     // 游戏基本宽
     GameConfig.stageWidth = 750;
     // 游戏基本高
@@ -458,31 +462,10 @@ var Main = (function (_super) {
         this.onShowFriendScore();
     };
     /**
-     * 再玩一次
+     * 分享给朋友
      */
     Main.prototype.btn3 = function () {
-        /* 右上角转发按钮设置 */
-        // wx.onShareAppMessage(function () {
-        //     // 用户点击了“转发”按钮
-        //     return {
-        //         title: '转发标题'
-        //     }
-        // });
-        console.log('btn3333');
-        wx.shareAppMessage({
-            title: "\u6211\u65B9\u4E86 ---- \u6211\u53D6\u5F97\u4E86" + GameConfig.getGameScore() + "\u5206, \u5FEB\u6765\u6311\u6218\u6211\u5427\uFF01",
-            imageUrl: "",
-            query: "",
-            success: function success(res) {
-                console.log("分享成功", res);
-                // wx.showShareMenu({
-                //     withShareTicket: true
-                // });
-            },
-            fail: function fail(res) {
-                console.log("分享失败", res);
-            }
-        });
+        UserData.shareAppMessage();
     };
     /* 游戏结束 */
     Main.prototype.end = function () {
@@ -536,56 +519,24 @@ var Main = (function (_super) {
         if (localStorage.getItem('userInfo') === null || localStorage.getItem('userInfo') === "") {
             this.onCreatLoginBtn();
         }
-        // var btnClose = new egret.Sprite();
-        // btnClose.graphics.beginFill(0xffffff, 1);
-        // btnClose.graphics.drawRect(0, 0, 300, 300);
-        // btnClose.graphics.endFill();
-        // btnClose.touchEnabled = true;
-        // this.btnClose = btnClose;
-        // this.addChild( btnClose );
-        // btnClose.once(egret.TouchEvent.TOUCH_BEGIN, this.onShowFriendScore, this);
-        //简单实现，打开这关闭使用一个按钮。
-        this.rankCloseBtn = new egret.Shape();
-        this.rankCloseBtn.graphics.beginFill(0x000000, 1);
-        this.rankCloseBtn.graphics.drawRect(0, 0, 100, 100);
-        this.rankCloseBtn.graphics.endFill();
-        this.rankCloseBtn.touchEnabled = true;
+        /* 返回按钮, 关闭排行榜 */
+        this.rankCloseBtn = eKit.createBitmapByName("return_icon_png", {
+            width: 80,
+            height: 80,
+            x: 80,
+            y: 20,
+            touchEnabled: true
+        });
         this.rankCloseBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onShowFriendScore, this);
         //加载资源
         var platform = window.platform;
         platform.openDataContext.postMessage({
             command: 'loadRes'
         });
-        var sharedBtn = new eui.Button();
-        sharedBtn.y = 605;
-        sharedBtn.label = 'btnShared';
-        this.addChild(sharedBtn);
-        // sharedBtn.addEventListener(egret.TouchEvent.TOUCH_TAP, () => {
-        //     window.platform.shareAppMessage().then((res) => {
-        //         console.log('分享成功回调', res);
-        //     }, (err) => {
-        //         console.log('分享失败回调', err);
-        //     });
-        // }, this);
-        /**
-         * 当前按钮会退出小游戏线程
-         */
-        // let close = new eui.Button();
-        // close.y = 135;
-        // close.label = '退出';
-        // this.addChild(close);
-        // close.addEventListener(egret.TouchEvent.TOUCH_TAP, () => {
-        //     wx.exitMiniProgram({
-        //         success: (res) => {
-        //             console.log('退出成功', res);
-        //         },
-        //         fail: (err) => {
-        //             console.log('退出失败', err);
-        //         },
-        //         complete: (res) => {
-        //         }
-        //     })
-        // }, this);
+        /* 设置分享内容 */
+        UserData.onShareAppMessage();
+        /* 打开右上角分享 */
+        UserData.onShowShareMenu();
         this.addEventListener(egret.TouchEvent.TOUCH_TAP, function (evt) {
             console.log('输出主域点击事件');
         }, this);
@@ -615,16 +566,6 @@ var Main = (function (_super) {
         });
     };
     /**
-     * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
-     * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
-     */
-    Main.prototype.createBitmapByName = function (name) {
-        var result = new egret.Bitmap();
-        var texture = RES.getRes(name);
-        result.texture = texture;
-        return result;
-    };
-    /**
      * 显示微信好友成绩排行榜
      * Click the button
      */
@@ -635,6 +576,7 @@ var Main = (function (_super) {
         if (this.isdisplay) {
             this.bitmap.parent && this.bitmap.parent.removeChild(this.bitmap);
             this.rankingListMask.parent && this.rankingListMask.parent.removeChild(this.rankingListMask);
+            this.rankCloseBtn.parent && this.rankCloseBtn.parent.removeChild(this.rankCloseBtn);
             this.isdisplay = false;
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,
@@ -646,7 +588,7 @@ var Main = (function (_super) {
         else {
             //处理遮罩，避免开放数据域事件影响主域。
             this.rankingListMask = new egret.Shape();
-            this.rankingListMask.graphics.beginFill(0x000000, 1);
+            this.rankingListMask.graphics.beginFill(0x000000, 0.2);
             this.rankingListMask.graphics.drawRect(0, 0, this.stage.width, this.stage.height);
             this.rankingListMask.graphics.endFill();
             this.rankingListMask.alpha = 0.5;
@@ -2273,6 +2215,57 @@ var UserData = (function () {
             },
             fail: function (err) {
                 console.log('get openid failed with error', err);
+            }
+        });
+    };
+    /**
+     * 用户点击主域分享按钮
+     */
+    UserData.shareAppMessage = function () {
+        wx.shareAppMessage({
+            title: "\u6211\u65B9\u4E86 ---- \u6211\u53D6\u5F97\u4E86" + GameConfig.getGameScore() + "\u5206, \u5FEB\u6765\u6311\u6218\u6211\u5427\uFF01",
+            imageUrl: GameConfig.getShareImg(),
+            imageUrlId: GameConfig.getShareImgId(),
+            query: "",
+            success: function success(res) {
+                console.log("分享成功", res);
+            },
+            fail: function fail(res) {
+                console.log("分享失败", res);
+            }
+        });
+    };
+    /**
+     * 用户点击小程序右上角分享按钮
+     */
+    UserData.onShareAppMessage = function () {
+        wx.onShareAppMessage(function () {
+            return {
+                title: '我方了吖，一起来玩玩呗',
+                imageUrl: GameConfig.getShareImg(),
+                imageUrlId: GameConfig.getShareImgId()
+            };
+        });
+    };
+    /*
+     * 显示当前页面的转发按钮
+     * @default false
+     */
+    UserData.onShowShareMenu = function () {
+        wx.showShareMenu({
+            withShareTicket: true
+        });
+    };
+    /**
+     * 退出小程序
+     */
+    UserData.onExitMiniProgram = function () {
+        wx.exitMiniProgram({
+            success: function (res) {
+                console.log('退出小程序成功', res);
+            },
+            fail: function (err) {
+                console.log('退出小程序失败', err);
             }
         });
     };

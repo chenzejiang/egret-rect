@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "bg_jpg,egret_icon_png,description_json,over_mp3,point_mp3",
+			"keys": "bg_jpg,egret_icon_png,return_icon_png,description_json,over_mp3,point_mp3",
 			"name": "preload"
 		}
 	],
@@ -15,6 +15,11 @@
 			"name": "egret_icon_png",
 			"type": "image",
 			"url": "assets/egret_icon.png"
+		},
+		{
+			"name": "return_icon_png",
+			"type": "image",
+			"url": "assets/return_icon.png"
 		},
 		{
 			"name": "description_json",

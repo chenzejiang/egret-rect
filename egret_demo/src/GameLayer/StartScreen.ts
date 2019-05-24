@@ -9,7 +9,7 @@ class StartScreen extends egret.Sprite{
 	// private helpBtn:egret.Bitmap;
     // private title:egret.Bitmap;
 	// private rank:egret.Bitmap;
-    
+
     private hideStartScreen(evt:egret.TouchEvent):void  {
         var tw = egret.Tween.get( this.start_screen );
         tw.to( {y: -GameConfig.getHeight(), alpha: 1}, 0.5 * 1000).call(function(){
@@ -31,12 +31,12 @@ class StartScreen extends egret.Sprite{
         this.start_screen = start_screen;
         this.addChild( start_screen );
         start_screen.once(egret.TouchEvent.TOUCH_BEGIN, this.hideStartScreen, this);
-        
+
         let gameDetailText:egret.TextField = new egret.TextField();
         gameDetailText.textColor = 0xffffff;
         gameDetailText.width = GameConfig.getWidth();
         gameDetailText.textAlign = "center";
-        gameDetailText.text = "点击下面方形即可变圆\n松开即变回方形1";
+        gameDetailText.text = "点击方形即可变圆\n松开即变回方形";
         gameDetailText.size = 50;
         gameDetailText.lineSpacing = 15;
         gameDetailText.bold = true;

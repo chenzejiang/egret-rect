@@ -1,7 +1,7 @@
 
 /**
  * 统一设置游戏所有配置参数，含版本号，参数地址等
- * 
+ *
  */
 class GameConfig {
 
@@ -13,8 +13,10 @@ class GameConfig {
     private static version: string = "1.0.0";
     // 游戏基本分享标题
     private static shareTitle: string = "分享标题";
-    // 游戏基本分享图片
-    private static shareImg: string = "imgUrl";
+    // 游戏基本分享图片  , 从微信后台上传审核 比例：5:4
+    private static shareImg: string = "https://mmocgame.qpic.cn/wechatgame/0bucgU1yYX0prub4nPnJpE4vYD8TXH4o6vscbYibicFbRrOUBuZeMX8yVeBnX8xSicm/0";
+    // 游戏基本分享图片ID , 从微信后台上传审核
+    private static shareImgId: string = "oFIAckl3SMaBYfOaptmXlQ";
     // 游戏基本宽
     private static stageWidth: number = 750;
     // 游戏基本高
@@ -41,6 +43,8 @@ class GameConfig {
     public static getShareTitle() { return this.shareTitle };
 
     public static getShareImg() { return this.shareImg };
+
+    public static getShareImgId() { return this.shareImgId };
 
     public static getGameScore() { return this.gameScore };
 

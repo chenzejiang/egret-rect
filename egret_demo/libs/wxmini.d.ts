@@ -44,7 +44,7 @@ declare interface cloudTs {
 // }
 
 declare const wx: {
-    
+
     cloud:{
 		database(): void;
         callFunction(any): any;
@@ -83,7 +83,7 @@ declare const wx: {
     /**
      * 退出当前小游戏
      */
-    exitMiniProgram(object: {success:(res:any)=>void,fail:(res:any)=>void,complete:(res:any)=>void}): void;
+    exitMiniProgram(object: {success:(res:any)=>void,fail:(res:any)=>void,complete?:(res:any)=>void}): void;
     /**
      * 返回小程序启动参数
      */
@@ -256,7 +256,7 @@ declare const wx: {
      * 调用接口获取登录凭证（code）进而换取用户登录态信息，包括用户的唯一标识（openid） 及本次登录的 会话密钥（session_key）等。用户数据的加解密通讯需要依赖会话密钥完成。
      */
     login(object: {success:(res:any)=>void,fail:(res:any)=>void,complete?:(res:any)=>void}): void;
-    
+
     authorize(object: {scope:string,success:(res:any)=>void,fail:(res:any)=>void,complete:(res:any)=>void}): void;
     /**
      * 在无须用户授权的情况下，批量获取用户信息。该接口只在开放数据域下可用
@@ -303,11 +303,11 @@ declare const wx: {
      * 取消监听用户点击右上角菜单的“转发”按钮时触发的事件
      */
     offShareAppMessage(callback: ()=>void): void;
-    showShareMenu(object: {withShareTicket:boolean,success:(res:any)=>void,fail:(res:any)=>void,complete?:(res:any)=>void}): void;
+    showShareMenu(object: {withShareTicket:boolean,success?:(res:any)=>void,fail?:(res:any)=>void,complete?:(res:any)=>void}): void;
     /**
      * 主动拉起转发，进入选择通讯录界面。
      */
-    shareAppMessage(object: {title:string,imageUrl:string,query:string,success:(res:any)=>void,fail:(res:any)=>void,complete?:(res:any)=>void}): void;
+    shareAppMessage(object: {title:string,imageUrl:string,imageUrlId?:string,query:string,success:(res:any)=>void,fail:(res:any)=>void,complete?:(res:any)=>void}): void;
     updateShareMenu(object: {withShareTicket:boolean,success:(res:any)=>void,fail:(res:any)=>void,complete:(res:any)=>void}): void;
     setEnableDebug(object: {enableDebug:boolean,success:(res:any)=>void,fail:(res:any)=>void,complete:(res:any)=>void}): void;
     /**
