@@ -125,16 +125,18 @@ class WxKit {
      * 设置默认分享
      */
     public static setDefaultShare() {
-        console.log('set_default_share');
+        /* 打开右上角分享按钮 */
         wx.showShareMenu({
             withShareTicket: true,
-            success: (res) => { console.log('setting_success'); console.log(res); },
+            success: (res) => { console.log(res); },
             fail: (err) => { console.warn(err) }
         });
+        /* 右上角按钮的分享内容 */
         wx.onShareAppMessage(function () {
             return {
                 title: GameConfig.getShareTitle() || '',
-                imageUrl: GameConfig.getShareImg() || ''
+                imageUrl: GameConfig.getShareImg(),
+                imageUrlId:  GameConfig.getShareImgId()
             }
         });
 
@@ -250,7 +252,7 @@ class WxKit {
                 success: () => {
                     err_callback();
                 }
-            })
+            });
             return
         }
         // 低版本兼容方法

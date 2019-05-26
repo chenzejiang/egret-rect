@@ -129,41 +129,5 @@ class UserData {
             }
         });
     }
-    /**
-     * 用户点击小程序右上角分享按钮
-     */
-    public static onShareAppMessage() {
-        wx.onShareAppMessage(function () {
-            return {
-                title: '我方了吖，一起来玩玩呗',
-                imageUrl: GameConfig.getShareImg(),
-                imageUrlId:  GameConfig.getShareImgId()
-            }
-        });
-    }
-
-    /*
-     * 显示当前页面的转发按钮
-     * @default false
-     */
-    public static onShowShareMenu() {
-        wx.showShareMenu({
-            withShareTicket: true
-        });
-    }
-
-    /**
-     * 退出小程序
-     */
-    public static onExitMiniProgram() {
-        wx.exitMiniProgram({
-            success: (res) => {
-                console.log('退出小程序成功', res);
-            },
-            fail: (err) => {
-                console.log('退出小程序失败', err);
-            }
-        });
-    }
 }
 

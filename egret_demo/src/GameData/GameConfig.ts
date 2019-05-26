@@ -12,7 +12,7 @@ class GameConfig {
     // 游戏版本号
     private static version: string = "1.0.0";
     // 游戏基本分享标题
-    private static shareTitle: string = "分享标题";
+    private static shareTitle: string = "我方了吖，一起来玩玩呗";
     // 游戏基本分享图片  , 从微信后台上传审核 比例：5:4
     private static shareImg: string = "https://mmocgame.qpic.cn/wechatgame/0bucgU1yYX0prub4nPnJpE4vYD8TXH4o6vscbYibicFbRrOUBuZeMX8yVeBnX8xSicm/0";
     // 游戏基本分享图片ID , 从微信后台上传审核
@@ -29,7 +29,7 @@ class GameConfig {
     private static stage: egret.DisplayObjectContainer = null;
     // 游戏得分
     private static gameScore: string = "0";
-
+    // 微信云开发数据库
     private static db:any = null;
 
     public static getBasicUrl() { return this.basicUrl };

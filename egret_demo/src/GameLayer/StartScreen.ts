@@ -36,7 +36,7 @@ class StartScreen extends egret.Sprite{
         gameDetailText.textColor = 0xffffff;
         gameDetailText.width = GameConfig.getWidth();
         gameDetailText.textAlign = "center";
-        gameDetailText.text = "点击方形即可变圆\n松开即变回方形";
+        gameDetailText.text = "点击方形即可变圆\n松开即变回方形99";
         gameDetailText.size = 50;
         gameDetailText.lineSpacing = 15;
         gameDetailText.bold = true;

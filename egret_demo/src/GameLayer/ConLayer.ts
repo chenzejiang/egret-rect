@@ -68,29 +68,30 @@ class ConLayer extends egret.Sprite{
         const randow = Math.round(Math.random());
         let new_shape = new egret.Sprite();
         new_shape.graphics.beginFill(0xffffff);
-
+        // 这里有问题
         if(randow === 0){
             new_shape.graphics.drawCircle(GameConfig.getWidth() / 2, -this.SIZE, this.SIZE);
-            this.CREAT_RECT_SHAPE = 0;
+            new_shape["shapeType"] = 0;
         }else{
             new_shape.graphics.drawRect(GameConfig.getWidth() / 2 - this.SIZE , -this.SIZE * 2, this.SIZE * 2, this.SIZE * 2);
-            this.CREAT_RECT_SHAPE = 1;
+            new_shape["shapeType"] = 1;
         }
 
         new_shape.graphics.endFill();
+        console.log(new_shape);
         this.con_layer.addChild(new_shape);
         let tw = egret.Tween.get(new_shape);
         tw.to({y: 800 - this.SIZE}, 1 * 1000);
         tw.call((e)=>{
-            if(this.BOSS_SHAPE === this.CREAT_RECT_SHAPE){
-                console.log('正确匹配');
-                new_shape.alpha = 0;
+            if(this.BOSS_SHAPE === new_shape["shapeType"]){
+                // new_shape.alpha = 0;
                 // this.con_layer.removeChild(new_shape);
+                eKit.removeChild(new_shape);
                 this.onAddGameScore();
-                let sound:egret.Sound = RES.getRes("point_mp3");
-                sound.play(0,1);
+                // let sound:egret.Sound = RES.getRes("point_mp3");
+                // sound.play(0,1);
             }else{
-                console.log('游戏结束');
+                console.log('结束');
                 clearInterval(this.time1); // 取消创建
                 this.onGameOverText(); // 游戏结束动画
                 this.setGameScore(); // 设置分数
@@ -188,10 +189,13 @@ class ConLayer extends egret.Sprite{
         this.boss = boss;
         con_layer.addChild(boss);
         
-        // 监听boss的TOUCH
+        /* 触摸开始 */
         boss.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onBossTouchBegin, this);
+        /* 触摸结束 */
         boss.addEventListener(egret.TouchEvent.TOUCH_END, this.onBossTouchEnd, this);
-        
+        /* 触摸移除释放 */
+        boss.addEventListener(egret.TouchEvent.TOUCH_RELEASE_OUTSIDE, this.onBossTouchEnd, this);
+
         if(isTime){
             this.onStartCreatShape();
         }

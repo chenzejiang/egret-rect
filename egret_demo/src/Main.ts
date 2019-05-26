@@ -78,7 +78,6 @@ class Main extends egret.DisplayObjectContainer {
      * 再玩一次
      */
     private btn1():void {
-        console.log('btn1');
         this.startGame();
     }
 
@@ -166,14 +165,13 @@ class Main extends egret.DisplayObjectContainer {
             command:'loadRes'
         });
 
-        /* 设置分享内容 */
-        UserData.onShareAppMessage();
-        /* 打开右上角分享 */
-        UserData.onShowShareMenu();
+        /* 设置右上角分享 */
+        WxKit.setDefaultShare();
 
-        this.addEventListener(egret.TouchEvent.TOUCH_TAP, (evt: egret.TouchEvent) => {
-            console.log('输出主域点击事件');
-        }, this)
+
+        // this.addEventListener(egret.TouchEvent.TOUCH_TAP, (evt: egret.TouchEvent) => {
+        //     console.log('输出主域点击事件');
+        // }, this)
     }
 
     /**

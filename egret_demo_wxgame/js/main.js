@@ -291,7 +291,7 @@ var GameConfig = (function () {
     // 游戏版本号
     GameConfig.version = "1.0.0";
     // 游戏基本分享标题
-    GameConfig.shareTitle = "分享标题";
+    GameConfig.shareTitle = "我方了吖，一起来玩玩呗";
     // 游戏基本分享图片  , 从微信后台上传审核 比例：5:4
     GameConfig.shareImg = "https://mmocgame.qpic.cn/wechatgame/0bucgU1yYX0prub4nPnJpE4vYD8TXH4o6vscbYibicFbRrOUBuZeMX8yVeBnX8xSicm/0";
     // 游戏基本分享图片ID , 从微信后台上传审核
@@ -308,6 +308,7 @@ var GameConfig = (function () {
     GameConfig.stage = null;
     // 游戏得分
     GameConfig.gameScore = "0";
+    // 微信云开发数据库
     GameConfig.db = null;
     return GameConfig;
 }());
@@ -451,7 +452,6 @@ var Main = (function (_super) {
      * 再玩一次
      */
     Main.prototype.btn1 = function () {
-        console.log('btn1');
         this.startGame();
     };
     /**
@@ -533,13 +533,11 @@ var Main = (function (_super) {
         platform.openDataContext.postMessage({
             command: 'loadRes'
         });
-        /* 设置分享内容 */
-        UserData.onShareAppMessage();
-        /* 打开右上角分享 */
-        UserData.onShowShareMenu();
-        this.addEventListener(egret.TouchEvent.TOUCH_TAP, function (evt) {
-            console.log('输出主域点击事件');
-        }, this);
+        /* 设置右上角分享 */
+        WxKit.setDefaultShare();
+        // this.addEventListener(egret.TouchEvent.TOUCH_TAP, (evt: egret.TouchEvent) => {
+        //     console.log('输出主域点击事件');
+        // }, this)
     };
     /**
      * 获取用户信息按钮
@@ -1786,16 +1784,18 @@ var WxKit = (function () {
      * 设置默认分享
      */
     WxKit.setDefaultShare = function () {
-        console.log('set_default_share');
+        /* 打开右上角分享按钮 */
         wx.showShareMenu({
             withShareTicket: true,
-            success: function (res) { console.log('setting_success'); console.log(res); },
+            success: function (res) { console.log(res); },
             fail: function (err) { console.warn(err); }
         });
+        /* 右上角按钮的分享内容 */
         wx.onShareAppMessage(function () {
             return {
                 title: GameConfig.getShareTitle() || '',
-                imageUrl: GameConfig.getShareImg() || ''
+                imageUrl: GameConfig.getShareImg(),
+                imageUrlId: GameConfig.getShareImgId()
             };
         });
     };
@@ -2235,40 +2235,6 @@ var UserData = (function () {
             }
         });
     };
-    /**
-     * 用户点击小程序右上角分享按钮
-     */
-    UserData.onShareAppMessage = function () {
-        wx.onShareAppMessage(function () {
-            return {
-                title: '我方了吖，一起来玩玩呗',
-                imageUrl: GameConfig.getShareImg(),
-                imageUrlId: GameConfig.getShareImgId()
-            };
-        });
-    };
-    /*
-     * 显示当前页面的转发按钮
-     * @default false
-     */
-    UserData.onShowShareMenu = function () {
-        wx.showShareMenu({
-            withShareTicket: true
-        });
-    };
-    /**
-     * 退出小程序
-     */
-    UserData.onExitMiniProgram = function () {
-        wx.exitMiniProgram({
-            success: function (res) {
-                console.log('退出小程序成功', res);
-            },
-            fail: function (err) {
-                console.log('退出小程序失败', err);
-            }
-        });
-    };
     return UserData;
 }());
 __reflect(UserData.prototype, "UserData");
@@ -2337,29 +2303,31 @@ var ConLayer = (function (_super) {
         var randow = Math.round(Math.random());
         var new_shape = new egret.Sprite();
         new_shape.graphics.beginFill(0xffffff);
+        // 这里有问题
         if (randow === 0) {
             new_shape.graphics.drawCircle(GameConfig.getWidth() / 2, -this.SIZE, this.SIZE);
-            this.CREAT_RECT_SHAPE = 0;
+            new_shape["shapeType"] = 0;
         }
         else {
             new_shape.graphics.drawRect(GameConfig.getWidth() / 2 - this.SIZE, -this.SIZE * 2, this.SIZE * 2, this.SIZE * 2);
-            this.CREAT_RECT_SHAPE = 1;
+            new_shape["shapeType"] = 1;
         }
         new_shape.graphics.endFill();
+        console.log(new_shape);
         this.con_layer.addChild(new_shape);
         var tw = egret.Tween.get(new_shape);
         tw.to({ y: 800 - this.SIZE }, 1 * 1000);
         tw.call(function (e) {
-            if (_this.BOSS_SHAPE === _this.CREAT_RECT_SHAPE) {
-                console.log('正确匹配');
-                new_shape.alpha = 0;
+            if (_this.BOSS_SHAPE === new_shape["shapeType"]) {
+                // new_shape.alpha = 0;
                 // this.con_layer.removeChild(new_shape);
+                eKit.removeChild(new_shape);
                 _this.onAddGameScore();
-                var sound = RES.getRes("point_mp3");
-                sound.play(0, 1);
+                // let sound:egret.Sound = RES.getRes("point_mp3");
+                // sound.play(0,1);
             }
             else {
-                console.log('游戏结束');
+                console.log('结束');
                 clearInterval(_this.time1); // 取消创建
                 _this.onGameOverText(); // 游戏结束动画
                 _this.setGameScore(); // 设置分数
@@ -2446,9 +2414,12 @@ var ConLayer = (function (_super) {
         boss.touchEnabled = true;
         this.boss = boss;
         con_layer.addChild(boss);
-        // 监听boss的TOUCH
+        /* 触摸开始 */
         boss.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onBossTouchBegin, this);
+        /* 触摸结束 */
         boss.addEventListener(egret.TouchEvent.TOUCH_END, this.onBossTouchEnd, this);
+        /* 触摸移除释放 */
+        boss.addEventListener(egret.TouchEvent.TOUCH_RELEASE_OUTSIDE, this.onBossTouchEnd, this);
         if (isTime) {
             this.onStartCreatShape();
         }
@@ -2667,7 +2638,7 @@ var StartScreen = (function (_super) {
         gameDetailText.textColor = 0xffffff;
         gameDetailText.width = GameConfig.getWidth();
         gameDetailText.textAlign = "center";
-        gameDetailText.text = "点击下面方形即可变圆\n松开即变回方形1";
+        gameDetailText.text = "点击方形即可变圆\n松开即变回方形99";
         gameDetailText.size = 50;
         gameDetailText.lineSpacing = 15;
         gameDetailText.bold = true;
