@@ -1,14 +1,14 @@
 class UserData {
-    public static personalHighScore: boolean; // 分数
+    public static personalHighScore: any; // 分数
     public static prefetchHighScoreFailed: boolean; // 标志
 
-    private static openId:string;
-    private static id:string;
-    private static avatarUrl:string;
-    private static nickName:string;
-    private static city:string;
-    private static country:string;
-    private static gender:string;
+    private static openId: string;
+    private static id: string;
+    private static avatarUrl: string;
+    private static nickName: string;
+    private static city: string;
+    private static country: string;
+    private static gender: string;
     public static userInfo: {};
 
     public static getId(){
@@ -50,25 +50,18 @@ class UserData {
     }
 
     /**
-     * 更新数据到数据库
+     * 上传结果到微信云数据库
      */
     public static upDateScore($score:number) {
-        // 上传结果
-        // 调用 uploadScore 云函数
         wx.cloud.callFunction({
             name: 'uploadScore',
-            // data 字段的值为传入云函数的第一个参数 event
             data: {
                 score: $score
-            },
-            success: res => {
-                if (this.prefetchHighScoreFailed) {
-                    this.prefetchHighScore()
-                }
-            },
-            fail: err => {
-                console.error('云函数更新成绩失败：', err)
             }
+        }).then((res) => {
+            console.log('上传成绩到云数据成功：', res);
+        }).catch((err) => {
+            console.error('云函数更新成绩失败：', err)
         });
     }
     /**
@@ -76,22 +69,14 @@ class UserData {
      */
     public static prefetchHighScore() {
         GameConfig.getDB().collection('score').doc(`${localStorage.getItem('openId')}-score`).get()
-        .then(res => {
-            if (this.personalHighScore) {
-                if (res.data.max > this.personalHighScore) {
-                    console.log('更新最高分数');
-                    this.personalHighScore = res.data.max;
-                    /* 设置最高-游戏分数到开发数据域 */
-                    UserData.wxSetUserCloudStorage(String(this.personalHighScore));
-                }
-            } else {
-                this.personalHighScore = res.data.max;
-            }
+        .then((res) => {
+            console.log(res);
+            this.personalHighScore = res.data.max;
         })
-      .catch(err => {
-        console.error('db get score catch error', err);
-        this.prefetchHighScoreFailed = true
-      })
+        .catch((err) => {
+            console.error('db get score catch error', err);
+            this.prefetchHighScoreFailed = true
+        });
     }
 
     /**

@@ -379,7 +379,6 @@ var Main = (function (_super) {
     }
     Main.prototype.onAddToStage = function (event) {
         egret.lifecycle.addLifecycleListener(function (context) {
-            // custom lifecycle plugin
             context.onUpdate = function () {
             };
         });
@@ -434,7 +433,6 @@ var Main = (function (_super) {
     };
     /* 游戏主内容 */
     Main.prototype.go = function () {
-        console.log('main-go');
         this.removeChildren();
         var min = new ConLayer(true); // true 表示开启动画
         this.addChild(min);
@@ -505,8 +503,6 @@ var Main = (function (_super) {
         GameConfig.setDB();
         /* 开始页面 */
         this.startGame();
-        /* 创建开放数据域 */
-        // this.openDataContext();
         /* 获取openid */
         if (localStorage.getItem("openId") === null || localStorage.getItem("openId") === "") {
             UserData.getOpenId();
@@ -535,9 +531,6 @@ var Main = (function (_super) {
         });
         /* 设置右上角分享 */
         WxKit.setDefaultShare();
-        // this.addEventListener(egret.TouchEvent.TOUCH_TAP, (evt: egret.TouchEvent) => {
-        //     console.log('输出主域点击事件');
-        // }, this)
     };
     /**
      * 获取用户信息按钮
@@ -555,9 +548,6 @@ var Main = (function (_super) {
                         _a.sent();
                         // console.log(UserData.getOpenId());
                         wx.hideLoading();
-                        // 设置默认分享,需要登录后方可调用分享功能
-                        WxKit.setDefaultShare();
-                        WxKit.setOnShowRule();
                         return [2 /*return*/];
                 }
             });
@@ -569,7 +559,6 @@ var Main = (function (_super) {
      */
     Main.prototype.onShowFriendScore = function () {
         // let openDataContext = wx.getOpenDataContext();
-        console.log('onShowFriendScore', this.isdisplay);
         var platform = window.platform;
         if (this.isdisplay) {
             this.bitmap.parent && this.bitmap.parent.removeChild(this.bitmap);
@@ -2155,26 +2144,18 @@ var UserData = (function () {
         this.userInfo = userData;
     };
     /**
-     * 更新数据到数据库
+     * 上传结果到微信云数据库
      */
     UserData.upDateScore = function ($score) {
-        var _this = this;
-        // 上传结果
-        // 调用 uploadScore 云函数
         wx.cloud.callFunction({
             name: 'uploadScore',
-            // data 字段的值为传入云函数的第一个参数 event
             data: {
                 score: $score
-            },
-            success: function (res) {
-                if (_this.prefetchHighScoreFailed) {
-                    _this.prefetchHighScore();
-                }
-            },
-            fail: function (err) {
-                console.error('云函数更新成绩失败：', err);
             }
+        }).then(function (res) {
+            console.log('上传成绩到云数据成功：', res);
+        }).catch(function (err) {
+            console.error('云函数更新成绩失败：', err);
         });
     };
     /**
@@ -2184,17 +2165,8 @@ var UserData = (function () {
         var _this = this;
         GameConfig.getDB().collection('score').doc(localStorage.getItem('openId') + "-score").get()
             .then(function (res) {
-            if (_this.personalHighScore) {
-                if (res.data.max > _this.personalHighScore) {
-                    console.log('更新最高分数');
-                    _this.personalHighScore = res.data.max;
-                    /* 设置最高-游戏分数到开发数据域 */
-                    UserData.wxSetUserCloudStorage(String(_this.personalHighScore));
-                }
-            }
-            else {
-                _this.personalHighScore = res.data.max;
-            }
+            console.log(res);
+            _this.personalHighScore = res.data.max;
         })
             .catch(function (err) {
             console.error('db get score catch error', err);
@@ -2243,14 +2215,16 @@ var ConLayer = (function (_super) {
     function ConLayer(isTime) {
         var _this = _super.call(this) || this;
         _this.time1 = null;
+        _this.isEndGame = false;
         _this.game_over_text = egret.TextField;
-        _this.BOSS_SHAPE = 1; // boss的形状 1=方 0=圆 
+        _this.BOSS_SHAPE = 1; // boss的形状 1=方 0=圆
         _this.CREAT_RECT_SHAPE = 0; // 新创建的形状 1=方 0=圆
         _this.SIZE = 80; // 形状的大小
-        _this.GAME_SCORE = "0"; // 游戏分数
+        _this.GAME_SCORE = "21"; // 游戏分数
         _this.init(isTime);
         return _this;
     }
+    // getGameScore
     /**
      * 游戏结束动画
      */
@@ -2280,7 +2254,6 @@ var ConLayer = (function (_super) {
         var tw = egret.Tween.get(this.con_layer);
         tw.to({ y: -GameConfig.getHeight(), alpha: 0 }, 0.5 * 1000);
         tw.call(function () {
-            console.log('显示游戏结束界面');
             _this.removeChildren();
             // 动画结束显示结束
             var event = new GameEvent(GameEvent.GAME_OVER);
@@ -2313,9 +2286,12 @@ var ConLayer = (function (_super) {
             new_shape["shapeType"] = 1;
         }
         new_shape.graphics.endFill();
-        console.log(new_shape);
         this.con_layer.addChild(new_shape);
-        var tw = egret.Tween.get(new_shape);
+        var tw = egret.Tween.get(new_shape, { onChange: function () {
+                if (_this.isEndGame === true) {
+                    tw.setPaused(true);
+                }
+            }, onChangeObj: this });
         tw.to({ y: 800 - this.SIZE }, 1 * 1000);
         tw.call(function (e) {
             if (_this.BOSS_SHAPE === new_shape["shapeType"]) {
@@ -2328,6 +2304,7 @@ var ConLayer = (function (_super) {
             }
             else {
                 console.log('结束');
+                _this.isEndGame = true;
                 clearInterval(_this.time1); // 取消创建
                 _this.onGameOverText(); // 游戏结束动画
                 _this.setGameScore(); // 设置分数
@@ -2363,7 +2340,7 @@ var ConLayer = (function (_super) {
         // 定时创建新形状
         this.time1 = setInterval(function () {
             _this.onCreatShape();
-        }, 1 * 1000);
+        }, 0.5 * 1000);
         // this.onCreatShape();
     };
     ConLayer.prototype.onBossTouchBegin = function (evt) {
@@ -2439,7 +2416,7 @@ var EndScreen = (function (_super) {
      */
     EndScreen.prototype.onGetHotScoreText = function (num) {
         if (num === void 0) { num = 0; }
-        return "\u5386\u53F2\u6700\u9AD8\uFF1A" + UserData.personalHighScore;
+        return "\u5386\u53F2\u6700\u9AD8\uFF1A" + num;
     };
     /**
      * 获取超越了{number}的人数
@@ -2477,8 +2454,9 @@ var EndScreen = (function (_super) {
     };
     /**
      * 绘画结束UI
+     * @param {_highScore } 最高成绩
      */
-    EndScreen.prototype.endUi = function () {
+    EndScreen.prototype.endUi = function (_highScore) {
         var end_screen = new egret.Sprite();
         end_screen.graphics.beginFill(GameConfig.getGameColor());
         end_screen.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
@@ -2492,7 +2470,7 @@ var EndScreen = (function (_super) {
         highScoreText.textColor = 0xffffff;
         highScoreText.width = GameConfig.getWidth();
         highScoreText.textAlign = "center";
-        highScoreText.text = this.onGetHotScoreText();
+        highScoreText.text = this.onGetHotScoreText(_highScore);
         highScoreText.size = 65;
         highScoreText.lineSpacing = 15;
         highScoreText.y = 180;
@@ -2584,11 +2562,15 @@ var EndScreen = (function (_super) {
         endBtn3.addChild(endBtn3Text);
     };
     EndScreen.prototype.init = function () {
-        /* 获取游戏分数 */
-        var getGameScore = GameConfig.getGameScore();
+        /* 获取本次游戏分数 */
+        var getGameScore = Number(GameConfig.getGameScore());
+        /* 本次游戏成绩与历史成绩对比 */
+        var historyHighScore = getGameScore > UserData.personalHighScore ? getGameScore : UserData.personalHighScore;
+        /* 设置最高游戏分数到开发数据域 */
+        UserData.wxSetUserCloudStorage(String(historyHighScore));
         /* 更新游戏分数 */
-        UserData.upDateScore(Number(getGameScore));
-        this.endUi();
+        UserData.upDateScore(getGameScore);
+        this.endUi(historyHighScore);
     };
     //  排行按钮回调
     EndScreen.prototype.rankCallback = function (evt) {

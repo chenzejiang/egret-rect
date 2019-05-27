@@ -5,14 +5,13 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     private bitmap: egret.Bitmap;
-    private isdisplay = false;
+    private isdisplay: boolean = false;
     private rankingListMask: egret.Shape;
     private rankCloseBtn: egret.Bitmap;
     private startScene;
 
     private onAddToStage(event: egret.Event) {
         egret.lifecycle.addLifecycleListener((context) => {
-            // custom lifecycle plugin
             context.onUpdate = () => {
 
             }
@@ -59,7 +58,6 @@ class Main extends egret.DisplayObjectContainer {
 
     /* 游戏主内容 */
     private go():void {
-        console.log('main-go');
         this.removeChildren();
         let min = new ConLayer(true); // true 表示开启动画
         this.addChild(min);
@@ -134,8 +132,6 @@ class Main extends egret.DisplayObjectContainer {
 
         /* 开始页面 */
         this.startGame();
-        /* 创建开放数据域 */
-        // this.openDataContext();
 
         /* 获取openid */
         if(localStorage.getItem("openId") === null || localStorage.getItem("openId") === ""){
@@ -167,11 +163,6 @@ class Main extends egret.DisplayObjectContainer {
 
         /* 设置右上角分享 */
         WxKit.setDefaultShare();
-
-
-        // this.addEventListener(egret.TouchEvent.TOUCH_TAP, (evt: egret.TouchEvent) => {
-        //     console.log('输出主域点击事件');
-        // }, this)
     }
 
     /**
@@ -183,9 +174,6 @@ class Main extends egret.DisplayObjectContainer {
         await WxKit.login();
         // console.log(UserData.getOpenId());
         wx.hideLoading();
-        // 设置默认分享,需要登录后方可调用分享功能
-        WxKit.setDefaultShare();
-        WxKit.setOnShowRule();
     }
     /**
      * 显示微信好友成绩排行榜
@@ -193,7 +181,6 @@ class Main extends egret.DisplayObjectContainer {
      */
     private onShowFriendScore() {
         // let openDataContext = wx.getOpenDataContext();
-        console.log('onShowFriendScore', this.isdisplay);
         let platform: any = window.platform;
         if (this.isdisplay) {
             this.bitmap.parent && this.bitmap.parent.removeChild(this.bitmap);
