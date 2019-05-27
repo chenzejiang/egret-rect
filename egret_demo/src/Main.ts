@@ -204,10 +204,10 @@ class Main extends egret.DisplayObjectContainer {
             this.addChild(this.rankingListMask);
             this.addChild(this.rankCloseBtn);
             // this.addChild(this.btnClose);
-            //主要示例代码开始
+            // 主要示例代码开始
             this.bitmap = platform.openDataContext.createDisplayObject(null, this.stage.stageWidth, this.stage.stageHeight);
             this.addChild(this.bitmap);
-            //主域向子域发送自定义消息
+            // 主域向子域发送自定义消息
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,
                 text: 'hello',

@@ -429,6 +429,7 @@ function addOpenDataContextListener() {
           // }
           // 改变原始数据
           totalGroup = getFriendArrList;
+          console.log('111111111111111111111111111');
           console.log(totalGroup);
           requestAnimationFrameID = requestAnimationFrame(loop);
         }
@@ -465,7 +466,6 @@ addOpenDataContextListener();
  */
 function loop() {
   if (renderDirty) {
-    console.log(`stageWidth :${stageWidth}   stageHeight:${stageHeight}`)
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, sharedCanvas.width, sharedCanvas.height);
     drawRankPanel();

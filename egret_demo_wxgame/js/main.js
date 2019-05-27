@@ -583,10 +583,10 @@ var Main = (function (_super) {
             this.addChild(this.rankingListMask);
             this.addChild(this.rankCloseBtn);
             // this.addChild(this.btnClose);
-            //主要示例代码开始
+            // 主要示例代码开始
             this.bitmap = platform.openDataContext.createDisplayObject(null, this.stage.stageWidth, this.stage.stageHeight);
             this.addChild(this.bitmap);
-            //主域向子域发送自定义消息
+            // 主域向子域发送自定义消息
             platform.openDataContext.postMessage({
                 isDisplay: this.isdisplay,
                 text: 'hello',
@@ -2295,12 +2295,10 @@ var ConLayer = (function (_super) {
         tw.to({ y: 800 - this.SIZE }, 1 * 1000);
         tw.call(function (e) {
             if (_this.BOSS_SHAPE === new_shape["shapeType"]) {
-                // new_shape.alpha = 0;
-                // this.con_layer.removeChild(new_shape);
                 eKit.removeChild(new_shape);
                 _this.onAddGameScore();
-                // let sound:egret.Sound = RES.getRes("point_mp3");
-                // sound.play(0,1);
+                var sound = RES.getRes("point_mp3");
+                sound.play(0, 1);
             }
             else {
                 console.log('结束');
