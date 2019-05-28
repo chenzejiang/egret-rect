@@ -4,11 +4,12 @@ class Main extends egret.DisplayObjectContainer {
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
 
+    private endScene:any;
     private bitmap: egret.Bitmap;
     private isdisplay: boolean = false;
     private rankingListMask: egret.Shape;
     private rankCloseBtn: egret.Bitmap;
-    private startScene;
+    private startScene: any;
 
     private onAddToStage(event: egret.Event) {
         egret.lifecycle.addLifecycleListener((context) => {
@@ -54,8 +55,6 @@ class Main extends egret.DisplayObjectContainer {
         }
     }
 
-    private textfield: egret.TextField;
-
     /* 游戏主内容 */
     private go():void {
         this.removeChildren();
@@ -66,59 +65,27 @@ class Main extends egret.DisplayObjectContainer {
 
     /* 游戏主内容 */
     private startGame():void {
-        this.removeChildren();
-        var startScene = new StartScreen();
+        this.removeChildren(); // 暂时不删除
+        // eKit.removeChild(this.endScene);
+        // this.removeChild( this.endScene );
+
+        const startScene = new StartScreen();
         this.startScene = startScene;
         this.addChild(startScene);
         startScene.addEventListener(GameEvent.GAME_GO, this.go, this);
-    }
-    /**
-     * 再玩一次
-     */
-    private btn1():void {
-        this.startGame();
-    }
-
-    /**
-     * 微信好友排行榜
-     */
-    private btn2():void {
-        console.log('微信好友排行榜');
-        this.onShowFriendScore();
-    }
-
-    /**
-     * 分享给朋友
-     */
-    private btn3():void {
-        UserData.shareAppMessage();
     }
 
     /* 游戏结束 */
     private end():void {
         this.removeChildren();
         let endScene = new EndScreen();
+        endScene.once(GameEvent.GAME_BTN1, this.go, this); // 再玩一次
+        endScene.addEventListener(GameEvent.GAME_BTN2, this.onShowFriendScore, this); // 微信好友排行榜
+        endScene.addEventListener(GameEvent.GAME_BTN3, UserData.shareAppMessage, this); // 分享好友
         this.addChild(endScene);
-        endScene.once(GameEvent.GAME_BTN1, this.btn1, this); // 再玩一次
-        endScene.addEventListener(GameEvent.GAME_BTN2, this.btn2, this); // 排行榜
-        endScene.addEventListener(GameEvent.GAME_BTN3, this.btn3, this); // 更多游戏
+        this.endScene = endScene;
     }
-    private openDataContext() {
-        try{
-            //创建开放数据域显示对象
-            var platform:any = window.platform;
-            this.bitmap = platform.openDataContext.createDisplayObject(null, GameConfig.getWidth(), GameConfig.getHeight());
-            //主域向子域发送自定义消息
-            platform.openDataContext.postMessage({
-                isDisplay: this.isdisplay,
-                text: 'hello',
-                year: (new Date()).getFullYear(),
-                command: "open"
-            });
-        }catch(e){
-            console.log(e);
-        }
-    }
+
     /**
      * 创建游戏场景
      * Create a game scene
@@ -129,6 +96,9 @@ class Main extends egret.DisplayObjectContainer {
         /* 初始化微信云开发 - 云函数 */
         wx.cloud.init();
         GameConfig.setDB();
+
+        /* 创建游戏主界面UI */
+        this.addChild(new ConLayer(false));
 
         /* 开始页面 */
         this.startGame();
@@ -172,12 +142,10 @@ class Main extends egret.DisplayObjectContainer {
         console.log('onCreatLoginBtn');
         // 调用WxKit.login完成微信登陆授权操作，返回openId,token等数据;
         await WxKit.login();
-        // console.log(UserData.getOpenId());
         wx.hideLoading();
     }
     /**
      * 显示微信好友成绩排行榜
-     * Click the button
      */
     private onShowFriendScore() {
         // let openDataContext = wx.getOpenDataContext();

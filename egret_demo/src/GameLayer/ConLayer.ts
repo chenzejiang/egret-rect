@@ -1,20 +1,17 @@
 class ConLayer extends egret.Sprite{
-	public constructor(isTime?:boolean){
+	public constructor(isCreat?:boolean){
 		super();
-		this.init(isTime);
+		this.init(isCreat);
 	}
 	public time1: any = null;
     public isEndGame: boolean = false;
 	private con_layer: egret.Sprite;
 	private boss: egret.Sprite;
-	private game_score: egret.TextField;
-	private game_over_text = egret.TextField;
+	private game_score_text: egret.TextField;
 
-	private BOSS_SHAPE:number       = 1;  // boss的形状 1=方 0=圆
-	private CREAT_RECT_SHAPE:number = 0;  // 新创建的形状 1=方 0=圆
-	private SIZE:number             = 80; // 形状的大小
-	public GAME_SCORE:string        = "21";// 游戏分数
-	// getGameScore
+	private BOSS_SHAPE:number       = 1;   // boss的形状 1=方 0=圆
+	private SIZE:number             = 80;  // 形状的大小
+	public  GAME_SCORE:string       = '100';  // 游戏分数
 
 	/**
 	 * 游戏结束动画
@@ -26,7 +23,7 @@ class ConLayer extends egret.Sprite{
 		game_over_text.textAlign = "center";
 		game_over_text.text = "游 戏 结 束";
 		game_over_text.size = 80;
-		game_over_text.alpha = 0.6
+		game_over_text.alpha = 0.6;
 		game_over_text.bold = true;
 		game_over_text.y = -100;
 		this.con_layer.addChild(game_over_text);
@@ -59,7 +56,7 @@ class ConLayer extends egret.Sprite{
 	private onAddGameScore():void {
 		let new_score = String(Number(this.GAME_SCORE) + 1);
 		this.GAME_SCORE = new_score;
-		this.game_score.text = new_score;
+		this.game_score_text.text = new_score;
 	}
 
 	/**
@@ -85,8 +82,9 @@ class ConLayer extends egret.Sprite{
 				tw.setPaused(true);
             }
 		},  onChangeObj:this });
-		tw.to({y: 800 - this.SIZE}, 1 * 1000);
-		tw.call((e)=>{
+
+		tw.to({ y: 800 - this.SIZE }, 1000);
+		tw.call(() => {
 			if(this.BOSS_SHAPE === new_shape["shapeType"]){
 				eKit.removeChild(new_shape);
 				this.onAddGameScore();
@@ -131,24 +129,30 @@ class ConLayer extends egret.Sprite{
 	 * 开始创建元素
 	 */
 	private onStartCreatShape() {
-		// 定时创建新形状
-		this.time1 = setInterval(() => {
+		/* 创建时间 */
+		let creatTime = 1000 - Number(this.GAME_SCORE) * 10;
+		/* 限制最快创建不能大于 400 ms */
+		if(creatTime < 400) creatTime = 400;
+		/* 递归创建元素 */
+		setTimeout(() => {
 			this.onCreatShape();
-		}, 0.5 * 1000);
-		// this.onCreatShape();
+			if(!this.isEndGame){
+				this.onStartCreatShape();
+			}
+		}, creatTime);
 	}
 
-	private onBossTouchBegin(evt:egret.TouchEvent):void {
+	private onBossTouchBegin():void {
 		this.BOSS_SHAPE = 0; // 圆
 		this.boss.alpha = 0;
 	}
 
-	private onBossTouchEnd(evt:egret.TouchEvent):void {
+	private onBossTouchEnd():void {
 		this.BOSS_SHAPE = 1; // 方
 		this.boss.alpha = 1;
 	}
 
-	private init(isTime:boolean):void {
+	private init(isCreat:boolean):void {
 		const con_layer = new egret.Sprite();
 		con_layer.graphics.beginFill(GameConfig.getGameColor());
 		con_layer.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
@@ -165,17 +169,17 @@ class ConLayer extends egret.Sprite{
 		con_layer.addChild(line);
 
 		// 分数
-		let game_score:egret.TextField = new egret.TextField();
-		game_score.textColor = 0xffffff;
-		game_score.width = GameConfig.getWidth();
-		game_score.text = this.GAME_SCORE;
-		game_score.size = 60;
-		game_score.alpha = 0.5;
-		game_score.bold = true;
-		game_score.y = 40;
-		game_score.x = 40;
-		this.game_score = game_score;
-		con_layer.addChild(game_score);
+		let game_score_text:egret.TextField = new egret.TextField();
+		game_score_text.textColor = 0xffffff;
+		game_score_text.width = GameConfig.getWidth();
+		game_score_text.text = this.GAME_SCORE;
+		game_score_text.size = 60;
+		game_score_text.alpha = 0.5;
+		game_score_text.bold = true;
+		game_score_text.y = 40;
+		game_score_text.x = 40;
+		this.game_score_text = game_score_text;
+		con_layer.addChild(game_score_text);
 
 		// 圆
 		const boss_c = new egret.Sprite();
@@ -199,8 +203,8 @@ class ConLayer extends egret.Sprite{
 		boss.addEventListener(egret.TouchEvent.TOUCH_END, this.onBossTouchEnd, this);
 		/* 触摸移除释放 */
 		boss.addEventListener(egret.TouchEvent.TOUCH_RELEASE_OUTSIDE, this.onBossTouchEnd, this);
-
-		if(isTime){
+		console.log("isCreat",isCreat);
+		if(isCreat){
 			this.onStartCreatShape();
 		}
 	}

@@ -440,56 +440,23 @@ var Main = (function (_super) {
     };
     /* 游戏主内容 */
     Main.prototype.startGame = function () {
-        this.removeChildren();
+        // this.removeChildren(); // 暂时不删除
+        // eKit.removeChild(this.endScene);
+        this.removeChild(this.endScene);
         var startScene = new StartScreen();
         this.startScene = startScene;
         this.addChild(startScene);
         startScene.addEventListener(GameEvent.GAME_GO, this.go, this);
     };
-    /**
-     * 再玩一次
-     */
-    Main.prototype.btn1 = function () {
-        this.startGame();
-    };
-    /**
-     * 微信好友排行榜
-     */
-    Main.prototype.btn2 = function () {
-        console.log('微信好友排行榜');
-        this.onShowFriendScore();
-    };
-    /**
-     * 分享给朋友
-     */
-    Main.prototype.btn3 = function () {
-        UserData.shareAppMessage();
-    };
     /* 游戏结束 */
     Main.prototype.end = function () {
         this.removeChildren();
         var endScene = new EndScreen();
+        endScene.once(GameEvent.GAME_BTN1, this.go, this); // 再玩一次
+        endScene.addEventListener(GameEvent.GAME_BTN2, this.onShowFriendScore, this); // 微信好友排行榜
+        endScene.addEventListener(GameEvent.GAME_BTN3, UserData.shareAppMessage, this); // 分享好友
         this.addChild(endScene);
-        endScene.once(GameEvent.GAME_BTN1, this.btn1, this); // 再玩一次
-        endScene.addEventListener(GameEvent.GAME_BTN2, this.btn2, this); // 排行榜
-        endScene.addEventListener(GameEvent.GAME_BTN3, this.btn3, this); // 更多游戏
-    };
-    Main.prototype.openDataContext = function () {
-        try {
-            //创建开放数据域显示对象
-            var platform = window.platform;
-            this.bitmap = platform.openDataContext.createDisplayObject(null, GameConfig.getWidth(), GameConfig.getHeight());
-            //主域向子域发送自定义消息
-            platform.openDataContext.postMessage({
-                isDisplay: this.isdisplay,
-                text: 'hello',
-                year: (new Date()).getFullYear(),
-                command: "open"
-            });
-        }
-        catch (e) {
-            console.log(e);
-        }
+        this.endScene = endScene;
     };
     /**
      * 创建游戏场景
@@ -501,6 +468,8 @@ var Main = (function (_super) {
         /* 初始化微信云开发 - 云函数 */
         wx.cloud.init();
         GameConfig.setDB();
+        /* 创建游戏主界面UI */
+        this.addChild(new ConLayer(false));
         /* 开始页面 */
         this.startGame();
         /* 获取openid */
@@ -546,7 +515,6 @@ var Main = (function (_super) {
                     case 1:
                         // 调用WxKit.login完成微信登陆授权操作，返回openId,token等数据;
                         _a.sent();
-                        // console.log(UserData.getOpenId());
                         wx.hideLoading();
                         return [2 /*return*/];
                 }
@@ -555,7 +523,6 @@ var Main = (function (_super) {
     };
     /**
      * 显示微信好友成绩排行榜
-     * Click the button
      */
     Main.prototype.onShowFriendScore = function () {
         // let openDataContext = wx.getOpenDataContext();
@@ -2212,19 +2179,16 @@ var UserData = (function () {
 __reflect(UserData.prototype, "UserData");
 var ConLayer = (function (_super) {
     __extends(ConLayer, _super);
-    function ConLayer(isTime) {
+    function ConLayer(isCreat) {
         var _this = _super.call(this) || this;
         _this.time1 = null;
         _this.isEndGame = false;
-        _this.game_over_text = egret.TextField;
         _this.BOSS_SHAPE = 1; // boss的形状 1=方 0=圆
-        _this.CREAT_RECT_SHAPE = 0; // 新创建的形状 1=方 0=圆
         _this.SIZE = 80; // 形状的大小
-        _this.GAME_SCORE = "21"; // 游戏分数
-        _this.init(isTime);
+        _this.GAME_SCORE = '100'; // 游戏分数
+        _this.init(isCreat);
         return _this;
     }
-    // getGameScore
     /**
      * 游戏结束动画
      */
@@ -2266,7 +2230,7 @@ var ConLayer = (function (_super) {
     ConLayer.prototype.onAddGameScore = function () {
         var new_score = String(Number(this.GAME_SCORE) + 1);
         this.GAME_SCORE = new_score;
-        this.game_score.text = new_score;
+        this.game_score_text.text = new_score;
     };
     /**
      * 创建新形状
@@ -2292,8 +2256,8 @@ var ConLayer = (function (_super) {
                     tw.setPaused(true);
                 }
             }, onChangeObj: this });
-        tw.to({ y: 800 - this.SIZE }, 1 * 1000);
-        tw.call(function (e) {
+        tw.to({ y: 800 - this.SIZE }, 1000);
+        tw.call(function () {
             if (_this.BOSS_SHAPE === new_shape["shapeType"]) {
                 eKit.removeChild(new_shape);
                 _this.onAddGameScore();
@@ -2335,21 +2299,28 @@ var ConLayer = (function (_super) {
      */
     ConLayer.prototype.onStartCreatShape = function () {
         var _this = this;
-        // 定时创建新形状
-        this.time1 = setInterval(function () {
+        /* 创建时间 */
+        var creatTime = 1000 - Number(this.GAME_SCORE) * 10;
+        /* 限制最快创建不能大于 400 ms */
+        if (creatTime < 400)
+            creatTime = 400;
+        /* 递归创建元素 */
+        setTimeout(function () {
             _this.onCreatShape();
-        }, 0.5 * 1000);
-        // this.onCreatShape();
+            if (!_this.isEndGame) {
+                _this.onStartCreatShape();
+            }
+        }, creatTime);
     };
-    ConLayer.prototype.onBossTouchBegin = function (evt) {
+    ConLayer.prototype.onBossTouchBegin = function () {
         this.BOSS_SHAPE = 0; // 圆
         this.boss.alpha = 0;
     };
-    ConLayer.prototype.onBossTouchEnd = function (evt) {
+    ConLayer.prototype.onBossTouchEnd = function () {
         this.BOSS_SHAPE = 1; // 方
         this.boss.alpha = 1;
     };
-    ConLayer.prototype.init = function (isTime) {
+    ConLayer.prototype.init = function (isCreat) {
         var con_layer = new egret.Sprite();
         con_layer.graphics.beginFill(GameConfig.getGameColor());
         con_layer.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
@@ -2364,17 +2335,17 @@ var ConLayer = (function (_super) {
         line.graphics.endFill();
         con_layer.addChild(line);
         // 分数
-        var game_score = new egret.TextField();
-        game_score.textColor = 0xffffff;
-        game_score.width = GameConfig.getWidth();
-        game_score.text = this.GAME_SCORE;
-        game_score.size = 60;
-        game_score.alpha = 0.5;
-        game_score.bold = true;
-        game_score.y = 40;
-        game_score.x = 40;
-        this.game_score = game_score;
-        con_layer.addChild(game_score);
+        var game_score_text = new egret.TextField();
+        game_score_text.textColor = 0xffffff;
+        game_score_text.width = GameConfig.getWidth();
+        game_score_text.text = this.GAME_SCORE;
+        game_score_text.size = 60;
+        game_score_text.alpha = 0.5;
+        game_score_text.bold = true;
+        game_score_text.y = 40;
+        game_score_text.x = 40;
+        this.game_score_text = game_score_text;
+        con_layer.addChild(game_score_text);
         // 圆
         var boss_c = new egret.Sprite();
         boss_c.graphics.beginFill(0xffffff);
@@ -2395,7 +2366,8 @@ var ConLayer = (function (_super) {
         boss.addEventListener(egret.TouchEvent.TOUCH_END, this.onBossTouchEnd, this);
         /* 触摸移除释放 */
         boss.addEventListener(egret.TouchEvent.TOUCH_RELEASE_OUTSIDE, this.onBossTouchEnd, this);
-        if (isTime) {
+        console.log("isCreat", isCreat);
+        if (isCreat) {
             this.onStartCreatShape();
         }
     };
@@ -2589,10 +2561,6 @@ var StartScreen = (function (_super) {
         _this.init();
         return _this;
     }
-    // private startBtn:egret.Bitmap;
-    // private helpBtn:egret.Bitmap;
-    // private title:egret.Bitmap;
-    // private rank:egret.Bitmap;
     StartScreen.prototype.hideStartScreen = function (evt) {
         var _this = this;
         var tw = egret.Tween.get(this.start_screen);
@@ -2607,8 +2575,8 @@ var StartScreen = (function (_super) {
     };
     StartScreen.prototype.init = function () {
         var start_screen = new egret.Sprite();
-        start_screen.graphics.beginFill(0x000000, 0.5);
-        start_screen.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getWidth());
+        start_screen.graphics.beginFill(0xff9999, 0.5);
+        start_screen.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
         start_screen.graphics.endFill();
         start_screen.touchEnabled = true;
         this.start_screen = start_screen;
@@ -2618,7 +2586,7 @@ var StartScreen = (function (_super) {
         gameDetailText.textColor = 0xffffff;
         gameDetailText.width = GameConfig.getWidth();
         gameDetailText.textAlign = "center";
-        gameDetailText.text = "点击方形即可变圆\n松开即变回方形99";
+        gameDetailText.text = "点击方形即可变圆\n松开即变回方形";
         gameDetailText.size = 50;
         gameDetailText.lineSpacing = 15;
         gameDetailText.bold = true;
@@ -2633,15 +2601,6 @@ var StartScreen = (function (_super) {
         startGameText.bold = true;
         startGameText.y = 1000;
         start_screen.addChild(startGameText);
-    };
-    //  排行按钮回调
-    StartScreen.prototype.rankCallback = function (evt) {
-    };
-    //  开始按钮回调
-    StartScreen.prototype.startBtnCallback = function (evt) {
-    };
-    //  help按钮回调
-    StartScreen.prototype.helpBtnCallback = function (evt) {
     };
     return StartScreen;
 }(egret.Sprite));

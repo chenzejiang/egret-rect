@@ -1,6 +1,6 @@
 /**
  * 微信开放数据域
- * 使用 Canvas2DAPI 在 SharedCanvas 渲染一个排行榜，
+ * 使用 Canvas2DAPI 在 SharedCanvas 渲染一个排行榜
  * 并在主域中渲染此 SharedCanvas
  */
 
@@ -15,7 +15,8 @@ const assetsUrl = {
   icon: "openDataContext/assets/icon.png",
   box: "openDataContext/assets/box.png",
   panel: "openDataContext/assets/panel.png",
-  button: "openDataContext/assets/button.png",
+  prevBtn: "openDataContext/assets/prev-btn.png",
+  nextBtn: "openDataContext/assets/next-btn.png",
   line: "openDataContext/assets/line.png",
   title: "openDataContext/assets/rankingtitle.png"
 };
@@ -114,8 +115,8 @@ function init() {
  * 创建两个点击按钮
  */
 function drawButton() {
-  context_drawImage(assets.button, nextButtonX, nextButtonY, buttonWidth, buttonHeight);
-  context_drawImage(assets.button, lastButtonX, lastButtonY, buttonWidth, buttonHeight);
+  context_drawImage(assets.nextBtn, nextButtonX, nextButtonY, buttonWidth, buttonHeight);
+  context_drawImage(assets.prevBtn, lastButtonX, lastButtonY, buttonWidth, buttonHeight);
 }
 
 
@@ -378,7 +379,7 @@ function preloadAssets() {
  */
 function createScene() {
   if (sharedCanvas.width && sharedCanvas.height) {
-    console.log('初始化绘制屏幕完成');
+    console.log('初始化绘制开放域屏幕完成');
     stageWidth = sharedCanvas.width;
     stageHeight = sharedCanvas.height;
     init();
@@ -429,8 +430,7 @@ function addOpenDataContextListener() {
           // }
           // 改变原始数据
           totalGroup = getFriendArrList;
-          console.log('111111111111111111111111111');
-          console.log(totalGroup);
+          renderDirty = true;
           requestAnimationFrameID = requestAnimationFrame(loop);
         }
       }).catch((err)=>{
