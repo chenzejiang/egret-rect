@@ -10,7 +10,7 @@ class ConLayer extends egret.Sprite{
 
 	private BOSS_SHAPE:number       = 1;   // boss的形状 1=方 0=圆
 	private SIZE:number             = 80;  // 形状的大小
-	public  GAME_SCORE:string       = '20';  // 游戏分数
+	public  GAME_SCORE:string       = '0';  // 游戏分数
 
 	/**
 	 * 游戏结束动画

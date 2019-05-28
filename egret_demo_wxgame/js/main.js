@@ -2193,7 +2193,7 @@ var ConLayer = (function (_super) {
         _this.isEndGame = false;
         _this.BOSS_SHAPE = 1; // boss的形状 1=方 0=圆
         _this.SIZE = 80; // 形状的大小
-        _this.GAME_SCORE = '20'; // 游戏分数
+        _this.GAME_SCORE = '0'; // 游戏分数
         _this.init(isCreat);
         return _this;
     }

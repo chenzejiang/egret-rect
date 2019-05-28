@@ -1,7 +1,6 @@
 class UserData {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor() {
+
     }
     /**
      * 获取微信好友排行榜数据

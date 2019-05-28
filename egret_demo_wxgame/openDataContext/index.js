@@ -5,7 +5,7 @@
  */
 
 import UserDataClass from 'UserData';
-const UserData = new UserDataClass(1,2);
+const UserData = new UserDataClass();
 
 /**
  * 资源加载组，将所需资源地址以及引用名进行注册
