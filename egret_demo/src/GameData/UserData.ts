@@ -102,7 +102,7 @@ class UserData {
     public static shareAppMessage() {
         wx.shareAppMessage
         ({
-            title: `我方了 ---- 我取得了${ GameConfig.getGameScore() }分, 快来挑战我吧！`,
+            title: GameConfig.getFriendShareTitle(),
             imageUrl: GameConfig.getShareImg(),
             imageUrlId:  GameConfig.getShareImgId(),
             query: ``, // 传参

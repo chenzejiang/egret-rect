@@ -18,7 +18,7 @@ class StartScreen extends egret.Sprite{
 
 	private init(){
 		let start_screen = new egret.Sprite();
-		start_screen.graphics.beginFill(0xff9999, 0.5);
+		start_screen.graphics.beginFill(0x000000, 0.5);
 		start_screen.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
 		start_screen.graphics.endFill();
 		start_screen.touchEnabled = true;

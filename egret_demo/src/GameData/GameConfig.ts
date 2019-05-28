@@ -10,9 +10,14 @@ class GameConfig {
     // 游戏自定义ID
     private static appCode: number = 1;
     // 游戏版本号
-    private static version: string = "1.0.0";
+    private static version: string = "1.1.0";
     // 游戏基本分享标题
     private static shareTitle: string = "我方了吖，一起来玩玩呗";
+
+    private static friendShareTitle: Function = function () {
+        return `我方了 ---- 我取得了${ GameConfig.getGameScore() }分, 快来挑战我吧！`
+    };
+
     // 游戏基本分享图片  , 从微信后台上传审核 比例：5:4
     private static shareImg: string = "https://mmocgame.qpic.cn/wechatgame/0bucgU1yYX0prub4nPnJpE4vYD8TXH4o6vscbYibicFbRrOUBuZeMX8yVeBnX8xSicm/0";
     // 游戏基本分享图片ID , 从微信后台上传审核
@@ -41,6 +46,8 @@ class GameConfig {
     public static getVersion() { return this.version };
 
     public static getShareTitle() { return this.shareTitle };
+
+    public static getFriendShareTitle() { return this.friendShareTitle() };
 
     public static getShareImg() { return this.shareImg };
 

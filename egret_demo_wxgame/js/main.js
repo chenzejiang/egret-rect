@@ -260,6 +260,8 @@ var GameConfig = (function () {
     ;
     GameConfig.getShareTitle = function () { return this.shareTitle; };
     ;
+    GameConfig.getFriendShareTitle = function () { return this.friendShareTitle(); };
+    ;
     GameConfig.getShareImg = function () { return this.shareImg; };
     ;
     GameConfig.getShareImgId = function () { return this.shareImgId; };
@@ -289,9 +291,12 @@ var GameConfig = (function () {
     // 游戏自定义ID
     GameConfig.appCode = 1;
     // 游戏版本号
-    GameConfig.version = "1.0.0";
+    GameConfig.version = "1.1.0";
     // 游戏基本分享标题
     GameConfig.shareTitle = "我方了吖，一起来玩玩呗";
+    GameConfig.friendShareTitle = function () {
+        return "\u6211\u65B9\u4E86 ---- \u6211\u53D6\u5F97\u4E86" + GameConfig.getGameScore() + "\u5206, \u5FEB\u6765\u6311\u6218\u6211\u5427\uFF01";
+    };
     // 游戏基本分享图片  , 从微信后台上传审核 比例：5:4
     GameConfig.shareImg = "https://mmocgame.qpic.cn/wechatgame/0bucgU1yYX0prub4nPnJpE4vYD8TXH4o6vscbYibicFbRrOUBuZeMX8yVeBnX8xSicm/0";
     // 游戏基本分享图片ID , 从微信后台上传审核
@@ -440,9 +445,7 @@ var Main = (function (_super) {
     };
     /* 游戏主内容 */
     Main.prototype.startGame = function () {
-        // this.removeChildren(); // 暂时不删除
-        // eKit.removeChild(this.endScene);
-        this.removeChild(this.endScene);
+        // this.removeChildren();
         var startScene = new StartScreen();
         this.startScene = startScene;
         this.addChild(startScene);
@@ -460,7 +463,6 @@ var Main = (function (_super) {
     };
     /**
      * 创建游戏场景
-     * Create a game scene
      */
     Main.prototype.createGameScene = function () {
         /* 设置游戏参数内的默认舞台宽高 */
@@ -468,6 +470,13 @@ var Main = (function (_super) {
         /* 初始化微信云开发 - 云函数 */
         wx.cloud.init();
         GameConfig.setDB();
+        /* 第一层 */
+        var app_screen = new egret.Sprite();
+        app_screen.graphics.beginFill(GameConfig.getGameColor());
+        app_screen.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
+        app_screen.graphics.endFill();
+        this.app_screen = app_screen;
+        this.addChild(app_screen);
         /* 创建游戏主界面UI */
         this.addChild(new ConLayer(false));
         /* 开始页面 */
@@ -2162,7 +2171,7 @@ var UserData = (function () {
      */
     UserData.shareAppMessage = function () {
         wx.shareAppMessage({
-            title: "\u6211\u65B9\u4E86 ---- \u6211\u53D6\u5F97\u4E86" + GameConfig.getGameScore() + "\u5206, \u5FEB\u6765\u6311\u6218\u6211\u5427\uFF01",
+            title: GameConfig.getFriendShareTitle(),
             imageUrl: GameConfig.getShareImg(),
             imageUrlId: GameConfig.getShareImgId(),
             query: "",
@@ -2181,11 +2190,10 @@ var ConLayer = (function (_super) {
     __extends(ConLayer, _super);
     function ConLayer(isCreat) {
         var _this = _super.call(this) || this;
-        _this.time1 = null;
         _this.isEndGame = false;
         _this.BOSS_SHAPE = 1; // boss的形状 1=方 0=圆
         _this.SIZE = 80; // 形状的大小
-        _this.GAME_SCORE = '100'; // 游戏分数
+        _this.GAME_SCORE = '20'; // 游戏分数
         _this.init(isCreat);
         return _this;
     }
@@ -2259,22 +2267,28 @@ var ConLayer = (function (_super) {
         tw.to({ y: 800 - this.SIZE }, 1000);
         tw.call(function () {
             if (_this.BOSS_SHAPE === new_shape["shapeType"]) {
+                /* 删除正确匹配的元素 */
                 eKit.removeChild(new_shape);
+                /* 增加分数 */
                 _this.onAddGameScore();
+                /* 得分音效 */
                 var sound = RES.getRes("point_mp3");
                 sound.play(0, 1);
             }
             else {
-                console.log('结束');
+                /* 游戏结束标志 */
                 _this.isEndGame = true;
-                clearInterval(_this.time1); // 取消创建
-                _this.onGameOverText(); // 游戏结束动画
-                _this.setGameScore(); // 设置分数
+                /* 游戏结束动画 */
+                _this.onGameOverText();
+                /* 设置游戏分数 */
+                _this.setGameScore();
+                /* 游戏结束音效 */
                 var sound = RES.getRes("over_mp3");
                 sound.play(0, 1);
-                // 触发现实结束界面
-                // const event:GameEvent = new GameEvent(GameEvent.GAME_OVER);
-                // this.dispatchEvent(event);
+                /* 删除绑定的事件 */
+                _this.boss.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, _this.onBossTouchBegin, _this);
+                _this.boss.removeEventListener(egret.TouchEvent.TOUCH_END, _this.onBossTouchEnd, _this);
+                _this.boss.removeEventListener(egret.TouchEvent.TOUCH_RELEASE_OUTSIDE, _this.onBossTouchEnd, _this);
             }
         });
     };
@@ -2575,7 +2589,7 @@ var StartScreen = (function (_super) {
     };
     StartScreen.prototype.init = function () {
         var start_screen = new egret.Sprite();
-        start_screen.graphics.beginFill(0xff9999, 0.5);
+        start_screen.graphics.beginFill(0x000000, 0.5);
         start_screen.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
         start_screen.graphics.endFill();
         start_screen.touchEnabled = true;

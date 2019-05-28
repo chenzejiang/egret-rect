@@ -4,7 +4,8 @@ class Main extends egret.DisplayObjectContainer {
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
 
-    private endScene:any;
+    private endScene:egret.Sprite;
+    private app_screen: egret.Sprite;
     private bitmap: egret.Bitmap;
     private isdisplay: boolean = false;
     private rankingListMask: egret.Shape;
@@ -65,10 +66,7 @@ class Main extends egret.DisplayObjectContainer {
 
     /* 游戏主内容 */
     private startGame():void {
-        this.removeChildren(); // 暂时不删除
-        // eKit.removeChild(this.endScene);
-        // this.removeChild( this.endScene );
-
+        // this.removeChildren();
         const startScene = new StartScreen();
         this.startScene = startScene;
         this.addChild(startScene);
@@ -88,7 +86,6 @@ class Main extends egret.DisplayObjectContainer {
 
     /**
      * 创建游戏场景
-     * Create a game scene
      */
     private createGameScene() {
         /* 设置游戏参数内的默认舞台宽高 */
@@ -96,6 +93,14 @@ class Main extends egret.DisplayObjectContainer {
         /* 初始化微信云开发 - 云函数 */
         wx.cloud.init();
         GameConfig.setDB();
+
+        /* 第一层 */
+        let app_screen = new egret.Sprite();
+        app_screen.graphics.beginFill( GameConfig.getGameColor() );
+        app_screen.graphics.drawRect(0, 0, GameConfig.getWidth(), GameConfig.getHeight());
+        app_screen.graphics.endFill();
+        this.app_screen = app_screen;
+        this.addChild(app_screen);
 
         /* 创建游戏主界面UI */
         this.addChild(new ConLayer(false));

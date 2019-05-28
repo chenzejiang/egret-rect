@@ -3,7 +3,6 @@ class ConLayer extends egret.Sprite{
 		super();
 		this.init(isCreat);
 	}
-	public time1: any = null;
     public isEndGame: boolean = false;
 	private con_layer: egret.Sprite;
 	private boss: egret.Sprite;
@@ -11,7 +10,7 @@ class ConLayer extends egret.Sprite{
 
 	private BOSS_SHAPE:number       = 1;   // boss的形状 1=方 0=圆
 	private SIZE:number             = 80;  // 形状的大小
-	public  GAME_SCORE:string       = '100';  // 游戏分数
+	public  GAME_SCORE:string       = '20';  // 游戏分数
 
 	/**
 	 * 游戏结束动画
@@ -86,24 +85,27 @@ class ConLayer extends egret.Sprite{
 		tw.to({ y: 800 - this.SIZE }, 1000);
 		tw.call(() => {
 			if(this.BOSS_SHAPE === new_shape["shapeType"]){
+				/* 删除正确匹配的元素 */
 				eKit.removeChild(new_shape);
+				/* 增加分数 */
 				this.onAddGameScore();
+				/* 得分音效 */
 				let sound:egret.Sound = RES.getRes("point_mp3");
 				sound.play(0,1);
 			}else{
-				console.log('结束');
+				/* 游戏结束标志 */
 				this.isEndGame = true;
-
-				clearInterval(this.time1); // 取消创建
-				this.onGameOverText(); // 游戏结束动画
-				this.setGameScore(); // 设置分数
-
+				/* 游戏结束动画 */
+				this.onGameOverText();
+				/* 设置游戏分数 */
+				this.setGameScore();
+				/* 游戏结束音效 */
 				let sound:egret.Sound = RES.getRes("over_mp3");
 				sound.play(0,1);
-
-				// 触发现实结束界面
-				// const event:GameEvent = new GameEvent(GameEvent.GAME_OVER);
-				// this.dispatchEvent(event);
+				/* 删除绑定的事件 */
+				this.boss.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onBossTouchBegin, this);
+				this.boss.removeEventListener(egret.TouchEvent.TOUCH_END, this.onBossTouchEnd, this);
+				this.boss.removeEventListener(egret.TouchEvent.TOUCH_RELEASE_OUTSIDE, this.onBossTouchEnd, this);
 			}
 		});
 	}
