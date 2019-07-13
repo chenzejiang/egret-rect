@@ -99,10 +99,9 @@ class WxKit {
 
                     });
                 }
-            })
+            });
         return result;
     }
-
 
     /**
      * getUserInfo授权失败时重新弹出需授权弹窗,若拒绝则继续弹出
